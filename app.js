@@ -258,7 +258,7 @@ function csvToMenu(text){
   const H=rows[0].map(h=>h.trim().toLowerCase());
   const col=n=>H.indexOf(n);
   const ci={id:col('id'),cat:col('category'),name:col('name'),desc:col('description')<0?col('desc'):col('description'),
-    price:col('price'),veg:col('veg'),avail:col('available'),img:col('image'),ol:col('option_label'),oc:col('option_choices')};
+    price:col('price'),veg:col('veg'),avail:[col('available'),col('enabled'),col('enable'),col('status'),col('show')].find(i=>i>=0)??-1,img:col('image'),ol:col('option_label'),oc:col('option_choices')};
   if(ci.cat<0||ci.name<0)throw 'CSV needs at least "category" and "name" columns';
   const get=(row,k)=>ci[k]>=0&&row[ci[k]]!=null?String(row[ci[k]]).trim():'';
   const cats=[],byName={};
@@ -270,7 +270,7 @@ function csvToMenu(text){
     const it={id:get(row,'id')||uid('it'),name:nm,desc:get(row,'desc'),
       price:Math.max(0,parseInt(get(row,'price')||'0',10)||0),
       veg:!(vraw==='non-veg'||vraw==='nonveg'||vraw==='false'||vraw==='no'||vraw==='n'),
-      available:!(araw==='no'||araw==='false'||araw==='n'||araw==='0'||araw==='unavailable'||araw==='off'),
+      available:!['no','false','n','0','unavailable','off','disable','disabled','hide','hidden','inactive','x'].includes(araw),
       image:get(row,'img')};
     const oc=get(row,'oc');
     if(oc){const ch=oc.split(/[|;]/).map(s=>s.trim()).filter(Boolean).map(tok=>{const m=tok.match(/^(.+?):(\d+)$/);return m?{name:m[1].trim(),price:parseInt(m[2],10)}:tok;});if(ch.length)it.options={label:get(row,'ol')||'Options',choices:ch};}
