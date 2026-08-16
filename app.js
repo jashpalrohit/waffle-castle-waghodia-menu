@@ -1,20 +1,28 @@
-const STORE_KEY='waffle_castle_menu_v1', CUR='₹';
-// ▼▼▼ CHANGE THESE ▼▼▼
-// SHA-256 hash of the owner password (the plain password is NOT stored here).
-// To change it: run  echo -n 'yourNewPassword' | sha256sum  and paste the hex below.
-const OWNER_PASS_HASH='b33a2bc38d030d8868bdc843dc5959d2cb0f4ac03ee513783d9c17ce39c9e55a';
-const ADMIN_HASH='#wc-admin';         // secret link to reach the owner login, e.g.  yoursite/index.html#wc-admin
+const CUR='₹';
+// ▼▼▼ Backend (Supabase) — safe to be public; writes are protected by Row Level Security ▼▼▼
+const SUPABASE_URL='https://pyhtrkylkykqwklrzitm.supabase.co';
+const SUPABASE_KEY='sb_publishable_th2b-0LngMIeET39bLchaA_RacvqIZ-';
+const OWNER_EMAIL='jashpalrohit002@gmail.com';   // owner login (email hidden from UI; only password is typed)
+const ADMIN_HASH='#wc-admin';                    // secret link to reach the owner login
 // ▲▲▲ CHANGE THESE ▲▲▲
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let menu=null, activeCat='ALL', manage=false, idCounter=0, _veg=true, _avail=true;
 // an item is visible to customers unless explicitly marked unavailable; owners (manage) see all
 function isVisible(it){return manage||it.available!==false;}
 let authed=false;
 const collapsed=new Set();   // category ids that are collapsed
-try{authed=sessionStorage.getItem('wc_auth')==='1';}catch(e){}
 
-function load(){try{const s=localStorage.getItem(STORE_KEY);if(s)return JSON.parse(s);}catch(e){}return JSON.parse(JSON.stringify(window.DEFAULT_MENU));}
-function save(){localStorage.setItem(STORE_KEY,JSON.stringify(menu));}
-menu=load();
+// Start from the built-in menu; the live menu is then loaded from Supabase in boot().
+menu=JSON.parse(JSON.stringify(window.DEFAULT_MENU));
+async function loadMenu(){
+  try{const {data,error}=await sb.from('menu').select('data').eq('id',1).maybeSingle();
+    if(!error&&data&&data.data)menu=data.data;}catch(e){}
+}
+// Persist the whole menu to the cloud (owner must be logged in; RLS allows only authenticated writes).
+async function save(){
+  try{const {error}=await sb.from('menu').upsert({id:1,data:menu,updated_at:new Date().toISOString()});
+    if(error)toast('Save failed: '+error.message);}catch(e){toast('Save failed — check connection');}
+}
 
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
 function uid(p){idCounter++;return p+'_'+Date.now().toString(36)+idCounter;}
@@ -194,25 +202,26 @@ function openAuth(){
     '<div class="sheet-actions"><button class="cancel" onclick="closeSheet()">Cancel</button><button class="save" onclick="tryAuth()">Unlock</button></div>');
   setTimeout(()=>{const el=document.getElementById('f_pass');if(el){el.focus();el.addEventListener('keydown',e=>{if(e.key==='Enter')tryAuth();});}},0);
 }
-function sha256Hex(str){
-  if(!(window.crypto&&crypto.subtle))return Promise.reject('nocrypto');
-  return crypto.subtle.digest('SHA-256',new TextEncoder().encode(str))
-    .then(h=>[...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join(''));
-}
 function tryAuth(){
   const el=document.getElementById('f_pass');if(!el)return;
-  const val=el.value;
-  sha256Hex(val).then(hash=>{
-    if(hash===OWNER_PASS_HASH){
-      authed=true;try{sessionStorage.setItem('wc_auth','1');}catch(e){}
-      closeSheet();reflectAuth();
-      manage=true;document.body.classList.add('manage');document.getElementById('gear').classList.add('on');
-      render();toast('Unlocked — Manage mode ON');
-    }else{toast('Wrong password');const e2=document.getElementById('f_pass');if(e2){e2.value='';e2.focus();}}
-  }).catch(()=>toast('Login needs a secure (https) page'));
+  const pw=el.value;
+  toast('Signing in…');
+  sb.auth.signInWithPassword({email:OWNER_EMAIL,password:pw}).then(({data,error})=>{
+    if(error||!data||!data.session){toast(error&&/confirm/i.test(error.message)?'Confirm the owner email in Supabase':'Wrong password');const e2=document.getElementById('f_pass');if(e2){e2.value='';e2.focus();}return;}
+    authed=true;
+    closeSheet();reflectAuth();
+    manage=true;document.body.classList.add('manage');document.getElementById('gear').classList.add('on');
+    render();toast('Unlocked — Manage mode ON');
+    seedIfEmpty();
+  });
+}
+// On first login, if the cloud menu is empty, publish the current (built-in) menu so the DB has data.
+async function seedIfEmpty(){
+  try{const {data}=await sb.from('menu').select('id').eq('id',1).maybeSingle();
+    if(!data){await save();toast('Menu published to cloud');}}catch(e){}
 }
 function lock(){
-  authed=false;manage=false;try{sessionStorage.removeItem('wc_auth');}catch(e){}
+  authed=false;manage=false;try{sb.auth.signOut();}catch(e){}
   document.body.classList.remove('manage');document.getElementById('gear').classList.remove('on');
   reflectAuth();render();toast('Locked');
 }
@@ -288,7 +297,7 @@ document.getElementById('importBtn').onclick=()=>{if(!authed){toast('Unlock firs
 document.getElementById('fileIn').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
   r.onload=()=>{try{const d=csvToMenu(r.result);if(!confirm('Replace the whole menu with '+d.categories.reduce((a,c)=>a+c.items.length,0)+' items from this CSV?'))return;menu=d;save();activeCat='ALL';collapsed.clear();render();renderChips();toast('Menu updated from CSV');}catch(err){toast('CSV error: '+err);}};
   r.readAsText(f);e.target.value='';};
-document.getElementById('resetBtn').onclick=()=>{if(confirm('Reset to the original Zomato menu? Your edits will be lost.')){localStorage.removeItem(STORE_KEY);menu=load();activeCat='ALL';render();renderChips();toast('Menu reset');}};
+document.getElementById('resetBtn').onclick=()=>{if(!authed){toast('Unlock first');return;}if(confirm('Reset to the original built-in menu? This replaces the live menu for everyone.')){menu=JSON.parse(JSON.stringify(window.DEFAULT_MENU));activeCat='ALL';collapsed.clear();save();render();renderChips();toast('Menu reset');}};
 
 // Back-to-top crown button
 const toTop=document.getElementById('toTop');
@@ -303,4 +312,17 @@ const mascot=document.getElementById('mascot');
 if(mascot)mascot.onclick=()=>{toast(GREETINGS[_g++%GREETINGS.length]);};
 
 const _yr=document.getElementById('year');if(_yr)_yr.textContent=new Date().getFullYear();
-reflectAuth();renderChips();render();maybeAdmin();
+
+// ---- Boot: restore owner session, load live menu from cloud, subscribe to realtime updates ----
+async function boot(){
+  try{const {data}=await sb.auth.getSession();authed=!!(data&&data.session);}catch(e){}
+  await loadMenu();
+  reflectAuth();renderChips();render();maybeAdmin();
+  try{
+    sb.channel('menu-live')
+      .on('postgres_changes',{event:'*',schema:'public',table:'menu'},payload=>{
+        if(payload&&payload.new&&payload.new.data){menu=payload.new.data;renderChips();render();}
+      }).subscribe();
+  }catch(e){}
+}
+boot();
