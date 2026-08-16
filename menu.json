@@ -1,0 +1,719 @@
+{
+  "restaurant": "Waffle Castle",
+  "tagline": "Waghodia · Vadodara",
+  "source": "https://www.zomato.com/vadodara/waffle-castle-madhavpura/order",
+  "categories": [
+    {
+      "id": "cat_0",
+      "category": "Signature Waffles",
+      "items": [
+        {
+          "id": "ctl_777553963",
+          "name": "Belgian Chocolate Waffle",
+          "desc": "Decadence redefined with a signature waffle topped with premium Belgian chocolate.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/6a9/a1c22fb2a6a173b589728954900646a9.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553964",
+          "name": "Biscoff Royal Waffle",
+          "desc": "A treat fit for royalty with smooth Biscoff spread on a waffle.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/d8a/0067476e23e3705799ea18f62cb5ed8a.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553965",
+          "name": "Black White Delight Waffle",
+          "desc": "Harmonious flavors of black and white chocolate on a crispy waffle.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/7ec/fc0206f0b876963617b65e27754297ec.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553966",
+          "name": "Blueberry Cream Cheese Waffle",
+          "desc": "A crisp waffle topped with luscious cream cheese and tangy blueberry drizzle.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/e6f/94780aec9a1aee0061d05f8181ae3e6f.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553967",
+          "name": "Brownie Bliss With Almonds Waffle",
+          "desc": "A rich brownie and almond topping on a crispy waffle.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/c3d/9827ec94badd7f190ce0f81188c6ec3d.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553968",
+          "name": "Bubblegum Fantasy Waffle",
+          "desc": "A whimsical bubblegum-flavored waffle creation.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/c5a/143564ecf505d2f1311d2ff96af00c5a.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553969",
+          "name": "Buttery Maple Bliss Waffle",
+          "desc": "A warm, golden waffle paired with the timeless combo of butter and maple syrup.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/0ed/646de9a3a0e8b6c6fd79fb32f7aba0ed.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553970",
+          "name": "Chocolate Overload Waffle",
+          "desc": "A chocoholic's dream waffle with intense chocolate flavors.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/d1f/7007d47cfd897948674fbc61622acd1f.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553971",
+          "name": "Coffee Mocha Crisps Waffle",
+          "desc": "Experience mocha bliss with this coffee-flavored waffle creation.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/411/38c4f8299bda17830663d38173d7a411.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553972",
+          "name": "Hazelnut Heaven Nutella Waffle",
+          "desc": "Crispy waffle paired with the irresistible taste of Nutella",
+          "image": "https://b.zmtcdn.com/data/dish_photos/07b/a8948c06c16b3079bd72c225efb9007b.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553973",
+          "name": "Honey Butter Waffle",
+          "desc": "A crispy waffle infused with creamy butter and topped with honey for a classic indulgence.",
+          "image": "",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553974",
+          "name": "Kit Kat Choco Waffle",
+          "desc": "A waffle paired with KitKat iconic chocolatey crunch.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/1d3/ca2d6c26e4f72b6b20040674175c11d3.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553975",
+          "name": "Ocean Cookie Crunch Waffle",
+          "desc": "A gourmet waffle topped with cookies and ocean inspired accents.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/eb2/6390c91f50278bc8715b5fe080748eb2.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553976",
+          "name": "Rainbow Gems Crunch Waffle",
+          "desc": "",
+          "image": "https://b.zmtcdn.com/data/dish_photos/422/36609334d42b5e59700c705052faa422.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553977",
+          "name": "Red And White Choco Waffle",
+          "desc": "",
+          "image": "https://b.zmtcdn.com/data/dish_photos/ace/d40fc0d6acb202ecc5623a6456b8eace.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553978",
+          "name": "Red Velvet Waffle",
+          "desc": "A signature waffle dressed in vibrant red velvet glory.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/c1b/32d3207b5d10e3a172c0f9d6c7c27c1b.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553979",
+          "name": "Royal Kunafa Crunch Waffle",
+          "desc": "",
+          "image": "https://b.zmtcdn.com/data/dish_photos/def/30b46c4dde47c877e4d8512c71939def.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553980",
+          "name": "Strawberry Cream Cheese Waffle",
+          "desc": "A signature waffle layered with cream cheese and juicy strawberry toppings.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/e69/94283109f0e76c1f3c9b4e68d1581e69.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553981",
+          "name": "Strawberry Swirl Waffle",
+          "desc": "A signature waffle topped with luscious strawberry swirls.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/95d/e36c442249ad6ca05fae1ea50d7d695d.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553982",
+          "name": "Triple Treat Choco Waffle",
+          "desc": "Three layers of chocolate magic on a signature waffle.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/0d3/aedf68f22c311915f8ac783d89aed0d3.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553983",
+          "name": "Walnut Wonder Waffle",
+          "desc": "Premium walnut toppings on a classic signature waffle.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/414/45f9b4d37a7c06ca27ac52e744559414.jpeg",
+          "price": 0,
+          "veg": true
+        }
+      ]
+    },
+    {
+      "id": "cat_1",
+      "category": "Long Waffle Sticks",
+      "items": [
+        {
+          "id": "ctl_777553984",
+          "name": "Belgian Chocolate LWS",
+          "desc": "A crisp waffle stick coated in luscious Belgian chocolate.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/ef8/72ddfb2e20940242945f770b104baef8.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553985",
+          "name": "Biscoff Royal LWS",
+          "desc": "A waffle stick layered with rich Biscoff goodness.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/bb4/045cbcd20ca04710130ead3d9bf6fbb4.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553986",
+          "name": "Black White Delight LWS",
+          "desc": "A duo of chocolates on a waffle stick for delightful bites.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/164/bb625ba153d81721ea29e5828763a164.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553987",
+          "name": "Brownie Bliss With Almonds LWS",
+          "desc": "A waffle stick loaded with brownies and almonds.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/4b7/79fb3aa285f03835dcfc49a4d5d0d4b7.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553988",
+          "name": "Bubblegum Fantasy LWS",
+          "desc": "A waffle stick infused with sweet bubblegum essence.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/215/820dc0e3083e75a69c4665a0b139c215.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553989",
+          "name": "Chocolate Overload LWS",
+          "desc": "A waffle stick bursting with layers of chocolatey goodness.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/531/c03228769dd3bd0a76d346b725d0d531.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553990",
+          "name": "Coffee Mocha Crisps LWS",
+          "desc": "A crisp waffle stick paired with a bold mocha coffee flavor.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/9d5/81b6435c8f52cc8e698a66a44a42c9d5.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553991",
+          "name": "Hazelnut Heaven Nutella LWS",
+          "desc": "A waffle stick dipped in Nutella for a delightful nutty treat.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/3c6/d206641cd0ef734a845dd39f32b373c6.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553992",
+          "name": "Kit Kat Choco LWS",
+          "desc": "A waffle stick studded with Kit Kat pieces for a chocolate crunch.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/3ee/cf88907a48e2c954477e06a2844073ee.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553993",
+          "name": "Ocean Cookie Crunch LWS",
+          "desc": "A waffle stick adorned with crushed cookies and sweet ocean vibes.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/651/3be69c00a87f48d3264ba36faea0d651.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553994",
+          "name": "Red And White Choco LWS",
+          "desc": "",
+          "image": "https://b.zmtcdn.com/data/dish_photos/3e4/669e5f87719621f30daa8834a486e3e4.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553995",
+          "name": "Red Velvet LWS",
+          "desc": "A waffle stick celebrating the rich taste of red velvet.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/131/951fb841b54a4b46ca3f318d09c3c131.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553996",
+          "name": "Strawberry Swirl LWS",
+          "desc": "A waffle stick with vibrant strawberry swirls.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/e65/ae0b5e636f81aa7475880fce5ac17e65.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553997",
+          "name": "Triple Treat Choco LWS",
+          "desc": "A triple chocolate blast on a waffle stick.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/c54/05af6ba12bc6745c335fbbddfab14c54.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777553998",
+          "name": "Walnut Wonder Waffle LWS",
+          "desc": "A waffle stick enriched with crunchy walnuts.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/e51/69b2c460c316ef8f1fd83871cb894e51.jpeg",
+          "price": 0,
+          "veg": true
+        }
+      ]
+    },
+    {
+      "id": "cat_2",
+      "category": "Mini Pancakes",
+      "items": [
+        {
+          "id": "ctl_777553999",
+          "name": "Belgian Chocolate MPC - 8 Pcs",
+          "desc": "Indulge in mini pancakes drenched in rich, velvety Belgian chocolate.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/7f3/45f065b901033eaf7284572a548437f3.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554000",
+          "name": "Biscoff Royal MPC - 8 Pcs",
+          "desc": "Luxurious Biscoff spread on mini pancakes for a royal taste.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/200/b5cb41e24c3d94e21c292cd5f56a8200.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554001",
+          "name": "Black White Delight MPC - 8 Pcs",
+          "desc": "Mini pancakes that marry white and dark chocolate for a balanced treat.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/26e/d8b73b8ef465ffb181d6937db1edc26e.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554002",
+          "name": "Blueberry Cream Cheese MPC - 8 Pcs",
+          "desc": "Sweet blueberries and velvety cream cheese elevate these mini pancakes to gourmet status.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/29c/e8bc561929efad89e43e280cc66de29c.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554003",
+          "name": "Brownie Bliss With Almonds MPC - 8 Pcs",
+          "desc": "Mini pancakes topped with brownie chunks and crunchy almonds.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/21b/d3c9fbf7c653fac408c7f551dd94c21b.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554004",
+          "name": "Bubblegum Fantasy MPC - 8 Pcs",
+          "desc": "A burst of bubblegum flavor on soft mini pancakes.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/6d5/255085ca5e82ea3c8cc1dee7a1d2c6d5.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554005",
+          "name": "Buttery Maple Bliss MPC - 8 Pcs",
+          "desc": "Fluffy mini pancakes soaked in rich butter and maple syrup for a heavenly experience.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/cf9/ecc588b0cda4453eed8263f230d51cf9.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554006",
+          "name": "Chocolate Overload MPC - 8 Pcs",
+          "desc": "Rich chocolate sauce poured over mini pancakes for an irresistible treat.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/cd8/b65cadc64554701f8991ab30bd0cbcd8.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554007",
+          "name": "Coffee Mocha Crisps MPC - 8 Pcs",
+          "desc": "Mini pancakes infused with coffee mocha and a crispy surprise for coffee enthusiasts.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/868/573049155a8eab948a4fde30707d1868.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554008",
+          "name": "Hazelnut Heaven Nutella MPC - 8 Pcs",
+          "desc": "Mini pancakes generously coated with Nutella for hazelnut lovers.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/b5f/3740560f565d7c9429347c38a98ecb5f.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554009",
+          "name": "Honey Butter MPC - 8 Pcs",
+          "desc": "Sweet and buttery mini pancakes drizzled with golden honey for the perfect comforting treat.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/4f2/ac7af12770a4a027172583c9f5f444f2.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554010",
+          "name": "Kit Kat Choco MPC - 8 Pcs",
+          "desc": "Mini pancakes topped with crunchy KitKat pieces and chocolate drizzle.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/5a3/a1acae2a8a9cced10f4f97539b6e85a3.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554011",
+          "name": "Ocean Cookie Crunch MPC - 8 Pcs",
+          "desc": "Mini pancakes with crushed cookies and a dreamy blue theme.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/0c6/5c34ff012c528686e54741f142fc00c6.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554012",
+          "name": "Red And White Choco MPC - 8 Pcs",
+          "desc": "",
+          "image": "https://b.zmtcdn.com/data/dish_photos/45d/a101dfc1b857d878867c9608e91ae45d.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554013",
+          "name": "Red Velvet MPC - 8 Pcs",
+          "desc": "Mini pancakes with the classic elegance of red velvet flavors.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/e85/0c904fe9c2be49843bebd3ff92ba9e85.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554014",
+          "name": "Strawberry Cream Cheese MPC - 8 Pcs",
+          "desc": "Fresh strawberries paired with silky cream cheese on soft mini pancakes.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/679/fa6a1505b03cc12bb811b2f6b9f39679.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554015",
+          "name": "Strawberry Swirl MPC - 8 Pcs",
+          "desc": "Mini pancakes topped with a sweet and fruity strawberry swirl.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/58c/7388677e0f8c6689734beef5ed3d958c.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554016",
+          "name": "Triple Treat Choco MPC - 8 Pcs",
+          "desc": "Three layers of chocolate on mini pancakes for a triple indulgence.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/b94/335d821e4936fd93f5e02ed644b47b94.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_777554017",
+          "name": "Walnut Wonder Waffle MPC - 8 Pcs",
+          "desc": "Mini pancakes garnished with walnuts for a nutty delight.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/f38/8c21d6fc2052fd3dd4629a26638b3f38.jpeg",
+          "price": 0,
+          "veg": true
+        }
+      ]
+    },
+    {
+      "id": "cat_3",
+      "category": "Chill Thrill Shakes",
+      "items": [
+        {
+          "id": "ctl_776160869",
+          "name": "Belgian Cocoa Crush",
+          "desc": "Satisfy your chocolate cravings with this Belgian cocoa-infused shake.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/2c3/aa6ea7c930d7426f9e3cb57a50fc62c3.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160870",
+          "name": "Biscoff Bliss",
+          "desc": "Dive into the velvety smoothness of Biscoff in every sip of this blissful shake.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/765/f4166a80fbebbac496e21d96360ee765.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160871",
+          "name": "Blue Bliss (cream N Cookies)",
+          "desc": "A heavenly blend of cookies and cream with a touch of blue bliss.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/be1/63c3b6fe00fbd8e367e2b52039f4ebe1.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160872",
+          "name": "Bubblegum Bliss",
+          "desc": "A fun and vibrant shake bursting with bubblegum flavors.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/c89/d0ea4f31a5dcefc513cd751d18398c89.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160873",
+          "name": "Coffee Mocha Madness",
+          "desc": "A bold coffee mocha shake to energize your day with creamy decadence.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/75b/f60bf38da335b2b8c5cf40331d06475b.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160874",
+          "name": "Cold Coffee",
+          "desc": "[Shake] The perfect pick-me-up with a chilled, creamy shake coffee twist.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/598/74f0138d1a22d36ba35da2221e75a598.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160875",
+          "name": "Ferrero Fantasy",
+          "desc": "A premium shake inspired by the irresistible taste of Ferrero Rocher.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/5e4/85a38417bb871522b38c2516a61055e4.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160876",
+          "name": "Hazelnut Dream (nutella)",
+          "desc": "Indulge in the nutty richness of Nutella blended into a creamy and dreamy shake.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/0e5/abde0496e2231ea056f2c8c9c40440e5.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160877",
+          "name": "Kit Kat Crunch",
+          "desc": "Enjoy a delightful crunch of KitKat in this chocolatey shake treat.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/eb9/2883ff64727d2b9674d8c4dc7b1e2eb9.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160878",
+          "name": "Oreo Shake",
+          "desc": "Classic cookies and cream blended into a velvety Oreo shake.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/81a/07990d0e5642f2c44cfe7ff28e90281a.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160879",
+          "name": "Royal Brownie Bliss",
+          "desc": "Indulge in a regal shake loaded with brownie chunks and chocolate.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/a57/9862da9b4dbbdd1fb48fc18fbee7ba57.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160880",
+          "name": "Snickerlicious Milk Choco",
+          "desc": "A perfect mix of Snickers and milk chocolate for an energy-packed treat.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/001/7375f0381c414d6bbb6f813125af1001.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160881",
+          "name": "Strawberry Rush",
+          "desc": "Fresh, fruity strawberries blended into a creamy, refreshing shake.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/34c/09503b2e6ba3c505ea45326f77b0034c.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160882",
+          "name": "Velvet Indulgence (red Velvet)",
+          "desc": "Luxuriate in the silky, sweet flavor of red velvet in a rich shake.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/267/dac59cf9e574ab47bddada8c6a549267.jpeg",
+          "price": 0,
+          "veg": true
+        }
+      ]
+    },
+    {
+      "id": "cat_4",
+      "category": "Mini Waffles - Pack Of 4",
+      "items": [
+        {
+          "id": "ctl_776160884",
+          "name": "Mini Waffles - Assorted Pack Of 4",
+          "desc": "A mix of four mini waffles, each in a unique and delightful flavor, perfect for variety lovers.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/ea6/669ff4375a95df602f4f0e57b232bea6.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160883",
+          "name": "Mini Waffles - Chocolate Pack Of 4",
+          "desc": "Indulge in [four pieces] of chocolate-flavored mini waffles, perfect for chocoholics.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/eaa/a51216b78f29733816069f47edaebeaa.jpeg",
+          "price": 0,
+          "veg": true
+        }
+      ]
+    },
+    {
+      "id": "cat_5",
+      "category": "Waffle Cakes",
+      "items": [
+        {
+          "id": "ctl_776160885",
+          "name": "Creamy Crunchy Cookie",
+          "desc": "A waffle cake layered with creamy filling and crunchy cookie bits.,Double the delight with two layers of creamy cookies and crunch.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/2a6/0ecf624606a3f32e18a99da9f2b862a6.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160886",
+          "name": "Death By Chocolate",
+          "desc": "A chocolate lover",
+          "image": "https://b.zmtcdn.com/data/dish_photos/7b4/03ce5cf375558f781af0bba93a4b77b4.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160887",
+          "name": "Red Velvet Fantasy",
+          "desc": "Vibrant red velvet cake layers paired with a luscious cream topping.,A sophisticated double layered red velvet cake for ultimate indulgence.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/e67/cbd59698449bc69d2b76cdfa3faa8e67.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_776160888",
+          "name": "Strawberry Bliss",
+          "desc": "Sweet strawberries and whipped cream over a single waffle cake layer. A double layered treat with strawberries and velvety cream.",
+          "image": "https://b.zmtcdn.com/data/dish_photos/18f/07056f59409987f38e5aaed239a7f18f.jpeg",
+          "price": 0,
+          "veg": true
+        }
+      ]
+    },
+    {
+      "id": "cat_6",
+      "category": "Royal Combos",
+      "items": [
+        {
+          "id": "ctl_782849613",
+          "name": "Biscoff Lover Combo",
+          "desc": "Biscoff Royal Waffle+Biscoff Bliss Shake",
+          "image": "",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_782849614",
+          "name": "Castle Celebration Box",
+          "desc": "Single Layer Waffle Cake+Waffle [Pack of 4, Mini]",
+          "image": "",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_782849615",
+          "name": "Kunafa Royal Combo",
+          "desc": "Royal Kunafa Crunch+Any Shakes of your Choise",
+          "image": "",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_782849617",
+          "name": "Sugar Rush For Two",
+          "desc": "Rainbow Gems Crunch+Royal Kunafa Crunch+2 Shake of your Choise",
+          "image": "",
+          "price": 0,
+          "veg": true
+        }
+      ]
+    },
+    {
+      "id": "cat_7",
+      "category": "Royal Brownie Bowls",
+      "items": [
+        {
+          "id": "ctl_782849618",
+          "name": "Kitkat Crunch Bowl",
+          "desc": "",
+          "image": "https://b.zmtcdn.com/data/dish_photos/5f7/a73caf95863bed91d973b4f4372755f7.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_782849619",
+          "name": "Nutty Royal Bowl",
+          "desc": "",
+          "image": "https://b.zmtcdn.com/data/dish_photos/88e/99cbd0871068e349b1914b98f81bc88e.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_782849620",
+          "name": "Oreo Dream Bowl",
+          "desc": "",
+          "image": "https://b.zmtcdn.com/data/dish_photos/98e/a9184bf543f7112b045a9cc8f4c4b98e.jpeg",
+          "price": 0,
+          "veg": true
+        },
+        {
+          "id": "ctl_782849621",
+          "name": "The Biscoff Royal Bowl",
+          "desc": "",
+          "image": "https://b.zmtcdn.com/data/dish_photos/158/b728e4b7e3d55661c999f2144a991158.jpeg",
+          "price": 0,
+          "veg": true
+        }
+      ]
+    }
+  ]
+}
