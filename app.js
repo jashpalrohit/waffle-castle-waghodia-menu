@@ -221,7 +221,12 @@ function itemForm(cid,it){
     '<div class="fld"><label>Description</label><textarea id="f_desc" placeholder="Short description">'+esc(it?it.desc:'')+'</textarea></div>'+
     '<div class="fld"><label>Price ('+CUR+')</label><input id="f_price" type="number" min="0" step="1" value="'+(it?(it.price||0):0)+'"></div>'+
     '<div class="fld"><label>Type</label><div class="veg-toggle"><button type="button" id="veg_v" class="'+(veg?'sel':'')+'" onclick="setVeg(true)">Veg</button><button type="button" id="veg_n" class="'+(veg?'':'sel')+'" onclick="setVeg(false)">Non-veg</button></div></div>'+
-    '<div class="fld"><label>Image URL (optional)</label><input id="f_img" value="'+esc(it?it.image:'')+'" placeholder="https://..." oninput="prevImg()"><img class="imgprev" id="f_prev"></div>'+
+    '<div class="fld"><label>Image (optional)</label>'+
+      '<div class="img-row"><input id="f_img" value="'+esc(it?it.image:'')+'" placeholder="Paste a URL or upload" oninput="prevImg()">'+
+      '<button type="button" class="upl-btn" id="f_uplbtn" onclick="document.getElementById(\'f_file\').click()">Upload</button></div>'+
+      '<input type="file" id="f_file" accept="image/*" style="display:none" onchange="uploadImg(this)">'+
+      '<small class="fhint">Upload a photo from your device, or paste an image URL.</small>'+
+      '<img class="imgprev" id="f_prev"></div>'+
     '<div class="fld"><label>Options label (optional)</label><input id="f_optlabel" value="'+esc(it&&it.options?it.options.label||'':'')+'" placeholder="e.g. Chocolate"></div>'+
     '<div class="fld"><label>Option choices &mdash; comma separated (optional)</label><input id="f_optchoices" value="'+esc(it&&it.options&&it.options.choices?it.options.choices.map(c=>(c&&typeof c==='object')?(c.price!=null?c.name+':'+c.price:c.name):c).join(', '):'')+'" placeholder="e.g. Dark, White, Milk  or  Single:250, Double:400"><small class="fhint">Leave blank for no options. Add a price per choice with a colon, e.g. Single:250, Double:400. First choice shows as selected.</small></div>'+
     '<div class="sheet-actions"><button class="cancel" onclick="closeSheet()">Cancel</button><button class="save" onclick="saveItem(\''+cid+'\',\''+(it?it.id:'')+'\')">Save</button></div>';
@@ -229,6 +234,51 @@ function itemForm(cid,it){
 function setVeg(v){_veg=v;document.getElementById('veg_v').classList.toggle('sel',v);document.getElementById('veg_n').classList.toggle('sel',!v);}
 function setAvail(v){_avail=v;document.getElementById('av_y').classList.toggle('sel',v);document.getElementById('av_n').classList.toggle('sel',!v);}
 function prevImg(){const u=document.getElementById('f_img').value.trim();const p=document.getElementById('f_prev');if(u){p.src=u;p.style.display='block';p.onerror=()=>{p.style.display='none';};}else p.style.display='none';}
+// Take a device photo, shrink it in the browser, upload the small file to Supabase
+// Storage, and store only its short public URL in the menu (keeps the menu JSON tiny).
+const IMG_BUCKET='menu-images';   // public bucket in Supabase → Storage
+const IMG_MAX_DIM=900;            // longest edge, px — sharp on phones, small on the wire
+const IMG_QUALITY=0.72;           // JPEG quality
+function shrinkToBlob(file){
+  return new Promise((resolve,reject)=>{
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=()=>{
+      URL.revokeObjectURL(url);
+      let {width:w,height:h}=img;
+      if(Math.max(w,h)>IMG_MAX_DIM){const s=IMG_MAX_DIM/Math.max(w,h);w=Math.round(w*s);h=Math.round(h*s);}
+      const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+      cv.getContext('2d').drawImage(img,0,0,w,h);
+      cv.toBlob(b=>b?resolve(b):reject(new Error('Could not encode image')),'image/jpeg',IMG_QUALITY);
+    };
+    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Could not read that image'));};
+    img.src=url;
+  });
+}
+async function uploadImg(input){
+  if(!authed){toast('Unlock first');return;}
+  const file=input.files&&input.files[0];input.value='';
+  if(!file)return;
+  if(!/^image\//.test(file.type)){toast('Please choose an image file');return;}
+  if(file.size>15*1024*1024){toast('Image too large (max 15 MB)');return;}
+  const btn=document.getElementById('f_uplbtn');const label=btn?btn.textContent:'';
+  if(btn){btn.disabled=true;btn.textContent='Uploading…';}
+  try{
+    const blob=await shrinkToBlob(file);
+    const path='items/'+Date.now().toString(36)+'-'+Math.floor(performance.now()).toString(36)+'.jpg';
+    const {error}=await sb.storage.from(IMG_BUCKET).upload(path,blob,{cacheControl:'31536000',upsert:false,contentType:'image/jpeg'});
+    if(error)throw error;
+    const {data}=sb.storage.from(IMG_BUCKET).getPublicUrl(path);
+    const url=data&&data.publicUrl;
+    if(!url)throw new Error('No public URL returned');
+    const inp=document.getElementById('f_img');if(inp)inp.value=url;
+    prevImg();toast('Image uploaded');
+  }catch(err){
+    toast('Upload failed: '+((err&&err.message)||err));
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=label||'Upload';}
+  }
+}
 function addItem(cid){_veg=true;_avail=true;openSheet(itemForm(cid,null));setTimeout(prevImg,0);}
 function editItem(cid,iid){const it=findItem(cid,iid);_veg=!!it.veg;_avail=it.available!==false;openSheet(itemForm(cid,it));setTimeout(prevImg,0);}
 function saveItem(cid,iid){
