@@ -11,6 +11,7 @@ let menu=null, activeCat='ALL', manage=false, idCounter=0, _veg=true, _avail=tru
 function isVisible(it){return manage||it.available!==false;}
 let authed=false;
 const collapsed=new Set();   // category ids that are collapsed
+let offersOpen=false;        // "Offers & Notes" panel starts collapsed; expands on click
 
 // Start from the built-in menu; the live menu is then loaded from Supabase in boot().
 menu=JSON.parse(JSON.stringify(window.DEFAULT_MENU));
@@ -113,6 +114,63 @@ function render(){
   app.classList.toggle('noanim', !!f);   // skip entrance animation while searching
   app.innerHTML=html;
   document.getElementById('count').textContent=menu.categories.reduce((a,c)=>a+c.items.length,0)+' items in '+menu.categories.length+' categories';
+  renderOffers();
+}
+// ---- Offers & Notes (collapsible; owner-editable, stored with the menu in Supabase) ----
+// Escape first (safe), then turn **wrapped** text into bold. Owner writes **like this**.
+function fmtOffer(s){return esc(s).replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>');}
+const IC_OFFER='<svg class="ico offers-ico" viewBox="0 0 24 24"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>';
+function renderOffers(){
+  const box=document.getElementById('offersWrap');
+  if(!box)return;
+  const txt=(menu&&menu.offers?String(menu.offers):'').trim();
+  // Hide entirely from customers when there's nothing to show; owners always see it (to add content).
+  if(!txt&&!manage){box.innerHTML='';document.body.classList.remove('has-offers','offers-open');return;}
+  document.body.classList.add('has-offers');   // lifts the back-to-top button & footer above the dock
+  document.body.classList.toggle('offers-open',offersOpen);   // hide the back-to-top FAB while the panel is open
+  const lines=txt.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  let body;
+  if(lines.length)body=lines.map(l=>'<div class="offer-line">'+fmtOffer(l)+'</div>').join('');
+  else body='<div class="offers-empty">No offers or notes yet. Tap Edit to add some.</div>';
+  const editBtn=manage?'<button class="mini offers-edit" onclick="event.stopPropagation();editOffers()">Edit</button>':'';
+  const open=offersOpen;
+  // Panel is rendered ABOVE the button so the sticky dock expands upward on click.
+  box.innerHTML=
+    '<div class="offers-panel'+(open?'':' collapsed')+'"><div class="offers-panel-inner">'+body+'</div></div>'+
+    '<button type="button" class="offers-head'+(open?' open':'')+'" aria-expanded="'+(open?'true':'false')+'" onclick="toggleOffers()">'+
+      IC_OFFER+'<span class="offers-title">'+esc(menu&&menu.offersTitle?menu.offersTitle:'Offers & Notes')+'</span>'+editBtn+
+      '<span class="chev"><svg class="ico" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>'+
+    '</button>';
+}
+function setOffersOpen(open){
+  offersOpen=open;
+  const panel=document.querySelector('.offers-panel');
+  const head=document.querySelector('.offers-head');
+  if(panel)panel.classList.toggle('collapsed',!open);
+  if(head)head.classList.toggle('open',open);
+  document.body.classList.toggle('offers-open',open);
+}
+function toggleOffers(){setOffersOpen(!offersOpen);}
+// Tapping anywhere outside the dock closes the expanded panel
+document.addEventListener('click',e=>{if(offersOpen&&!e.target.closest('.offers-wrap'))setOffersOpen(false);});
+// Esc closes it too
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&offersOpen)setOffersOpen(false);});
+function editOffers(){
+  if(!authed)return;
+  openSheet('<h3>'+IC_OFFER+' Edit Offers &amp; Notes</h3>'+
+    '<div class="fld"><label>Section title</label>'+
+    '<input id="f_offerstitle" value="'+esc(menu.offersTitle||'')+'" placeholder="Offers & Notes"></div>'+
+    '<div class="fld"><label>Offers &amp; notes &mdash; one per line</label>'+
+    '<textarea id="f_offers" style="min-height:170px" placeholder="e.g. **Buy 1 Get 1** on Signature Waffles (Mon-Fri)\nAll waffles are **100% vegetarian**\nOpen 11 AM - 11 PM daily">'+esc(menu.offers||'')+'</textarea>'+
+    '<small class="fhint">Each line shows as its own point. Wrap text in **double asterisks** to make it <b>bold</b>. Leave blank to hide the section from customers.</small></div>'+
+    '<div class="sheet-actions"><button class="cancel" onclick="closeSheet()">Cancel</button><button class="save" onclick="saveOffers()">Save</button></div>');
+  setTimeout(()=>{const el=document.getElementById('f_offers');if(el)el.focus();},0);
+}
+function saveOffers(){
+  if(!authed)return;
+  menu.offers=document.getElementById('f_offers').value.trim();
+  menu.offersTitle=document.getElementById('f_offerstitle').value.trim();
+  save();closeSheet();setOffersOpen(true);renderOffers();toast('Offers & notes updated');
 }
 function toggleAll(){
   const ids=shownCatIds();
@@ -286,7 +344,7 @@ function csvToMenu(text){
     cat.items.push(it);
   }
   if(!cats.length)throw 'No valid rows found';
-  return {restaurant:menu.restaurant,tagline:menu.tagline,source:menu.source,categories:cats};
+  return {restaurant:menu.restaurant,tagline:menu.tagline,source:menu.source,offers:menu.offers||'',offersTitle:menu.offersTitle||'',categories:cats};
 }
 document.getElementById('exportBtn').onclick=()=>{
   const blob=new Blob(['﻿'+menuToCSV()],{type:'text/csv;charset=utf-8'});

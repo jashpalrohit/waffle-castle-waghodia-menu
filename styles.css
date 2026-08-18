@@ -169,6 +169,39 @@
   .sheet-actions .cancel{background:#eee3c8;color:var(--ink2)}
 
   .empty{text-align:center;color:var(--muted);padding:50px 0}
+
+  /* Offers & Notes — sticky floating dock pinned to the bottom; expands upward on tap */
+  .offers-wrap{position:fixed;left:0;right:0;bottom:0;z-index:42;
+    display:flex;flex-direction:column;align-items:center;
+    padding:0 12px calc(12px + env(safe-area-inset-bottom));pointer-events:none}
+  body.manage .offers-wrap{bottom:62px}   /* sit above the manage action bar */
+  .offers-wrap>*{pointer-events:auto;width:100%;max-width:520px}
+  .offers-head{display:flex;align-items:center;gap:9px;cursor:pointer;
+    background:linear-gradient(120deg,#fff4d6,#ffe6b3);border:1.5px solid var(--amber-deep);
+    border-radius:16px;padding:14px 16px;color:var(--ink);font-family:inherit;font-size:15px;
+    font-weight:800;letter-spacing:-.2px;box-shadow:0 8px 26px rgba(30,14,4,.26)}
+  .offers-head:active{transform:scale(.99)}
+  .offers-head .offers-ico{width:20px;height:20px;flex:0 0 auto;color:var(--amber-deep)}
+  .offers-head .offers-title{flex:1;min-width:0;text-align:left}
+  .offers-head .offers-edit{flex:0 0 auto}
+  .offers-head .chev{flex:0 0 auto;display:inline-flex;align-items:center;color:var(--amber-deep);
+    transform:rotate(180deg);transition:transform .28s ease}
+  .offers-head .chev .ico{width:20px;height:20px;stroke-width:2.5}
+  .offers-head.open .chev{transform:rotate(0)}   /* points down (to close) when open */
+  .offers-panel-inner{background:var(--card);border:1.5px solid var(--amber);border-radius:16px;
+    box-shadow:0 8px 26px rgba(30,14,4,.22);overflow-y:auto;max-height:46vh;padding:12px;margin-bottom:9px;
+    -webkit-overflow-scrolling:touch;
+    transition:max-height .32s ease,opacity .24s ease,padding .3s ease,margin .3s ease,border-color .3s ease}
+  .offers-panel.collapsed .offers-panel-inner{max-height:0;opacity:0;padding-top:0;padding-bottom:0;
+    margin-bottom:0;border-color:transparent;overflow:hidden}
+  .offer-line{position:relative;text-align:left;padding:9px 14px 9px 30px;background:#fff9ec;
+    border:1px solid #f3ead0;border-radius:12px;margin-bottom:8px;font-size:13.5px;
+    color:var(--ink2);font-weight:500;line-height:1.5}
+  .offer-line:last-child{margin-bottom:0}
+  .offer-line b{color:var(--ink);font-weight:800}
+  .offer-line::before{content:"\2726";position:absolute;left:12px;top:9px;color:var(--amber-deep);font-size:12px}
+  .offers-empty{text-align:left;padding:6px 4px;font-size:13px;color:var(--muted);font-weight:500}
+
   footer{text-align:center;color:var(--muted);font-size:12px;padding:26px 16px 10px;line-height:1.7}
   footer .b{font-family:var(--script);color:var(--amber-deep);font-size:18px}
   footer .disclaimer{display:flex;align-items:flex-start;gap:8px;text-align:left;max-width:360px;margin:14px auto 0;
@@ -254,6 +287,13 @@
   .totop.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
   .totop:active{transform:scale(.9)}
   body.manage .totop{bottom:78px}
+  /* Sticky Offers dock: lift the FAB and give the footer clearance so nothing is hidden */
+  body.has-offers .totop{bottom:90px}
+  body.has-offers.manage .totop{bottom:150px}
+  /* Hide the back-to-top FAB while the offers panel is open so they never overlap */
+  body.offers-open .totop{opacity:0;pointer-events:none;transform:translateY(20px) scale(.6)}
+  body.has-offers{padding-bottom:150px}
+  body.has-offers.manage{padding-bottom:210px}
 
   /* ---- Entrance animation for categories & cards (skipped while searching) ---- */
   @keyframes itemIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
