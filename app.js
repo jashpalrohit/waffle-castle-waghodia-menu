@@ -6,6 +6,9 @@ const OWNER_EMAIL='jashpalrohit002@gmail.com';   // owner login (email hidden fr
 const ADMIN_HASH='#wc-admin';                    // secret link to reach the owner login
 // ▲▲▲ CHANGE THESE ▲▲▲
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Disable page zoom on mobile (Safari ignores user-scalable=no, so block its pinch gesture; CSS touch-action handles the rest).
+['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
 let menu=null, activeCat='ALL', manage=false, idCounter=0, _veg=true, _avail=true, _popular=false;
 // an item is visible to customers unless explicitly marked unavailable; owners (manage) see all
 function isVisible(it){return manage||it.available!==false;}
@@ -579,22 +582,25 @@ document.getElementById('resetBtn').onclick=()=>{if(!authed){toast('Unlock first
 // Back-to-top crown button
 const toTop=document.getElementById('toTop');
 // Back-to-top button + iOS Instagram-style bottom bar shrink on scroll-down / expand on scroll-up.
-// rAF-throttled, and only writes classes when the state actually flips (keeps the CSS transition buttery).
+// Uses a direction accumulator (robust against mobile momentum / address-bar jitter), rAF-throttled,
+// and only writes classes when the state actually flips (keeps the CSS transition buttery).
 const _tabbar=document.querySelector('.tabbar');
-let _lastY=window.scrollY,_navShrunk=false,_ticking=false;
+let _lastY=0,_acc=0,_navShrunk=false,_ticking=false;
+function _setNav(shrink){
+  if(shrink===_navShrunk)return;
+  _navShrunk=shrink;
+  if(_tabbar)_tabbar.classList.toggle('shrunk',shrink);
+  document.body.classList.toggle('nav-shrunk',shrink);
+}
 function _onScroll(){
-  const y=window.scrollY;
+  const y=Math.max(0,(window.scrollY||(document.scrollingElement&&document.scrollingElement.scrollTop)||0));
   if(toTop)toTop.classList.toggle('show',y>420);
-  if(_tabbar){
-    let want=_navShrunk;
-    if(y>90&&y>_lastY+4)want=true;              // scrolling down
-    else if(y<_lastY-4||y<40)want=false;        // scrolling up / near top
-    if(want!==_navShrunk){
-      _navShrunk=want;
-      _tabbar.classList.toggle('shrunk',want);
-      document.body.classList.toggle('nav-shrunk',want);
-    }
-  }
+  const dy=y-_lastY;
+  if((dy>0)!==(_acc>0))_acc=0;      // direction flipped → reset the accumulator
+  _acc+=dy;
+  if(y<=24)_setNav(false);           // near the top → always full size
+  else if(_acc>14)_setNav(true);     // moved down enough → shrink
+  else if(_acc<-14)_setNav(false);   // moved up enough → expand
   _lastY=y;_ticking=false;
 }
 window.addEventListener('scroll',()=>{if(!_ticking){_ticking=true;requestAnimationFrame(_onScroll);}},{passive:true});

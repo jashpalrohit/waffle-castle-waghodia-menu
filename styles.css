@@ -8,7 +8,7 @@
   .ico{width:1em;height:1em;display:inline-block;vertical-align:-.14em;flex:0 0 auto;
     fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .ico-f{fill:currentColor;stroke:none}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;touch-action:pan-x pan-y}   /* disable pinch-zoom, keep scrolling */
   body{font-family:var(--sans);color:var(--ink);
     background:
       radial-gradient(circle at 1px 1px, rgba(180,130,50,.07) 1.3px, transparent 1.6px) 0 0/22px 22px,
