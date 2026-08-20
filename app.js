@@ -56,6 +56,20 @@ function jumpToCat(cid){
   activeCat='ALL';collapsed.delete(cid);renderChips();render();
   setTimeout(()=>{const el=document.getElementById('c-'+cid);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},60);
 }
+// Zomato-style "Menu" button → slide-up drawer listing categories; tap one to jump to it.
+function openCategorySheet(){
+  const vcount=c=>c.items.filter(isVisible).length;
+  const rows=menu.categories.map(c=>{const n=vcount(c);if(!manage&&!n)return '';
+    return '<button type="button" class="cat-sheet-item" onclick="gotoCat(\''+c.id+'\')"><span>'+esc(c.category)+'</span><span class="n">'+n+'</span></button>';}).join('');
+  const list=document.getElementById('catDrawerList');
+  if(list)list.innerHTML=rows||'<div class="offers-empty">No categories yet.</div>';
+  document.getElementById('catDrawerOverlay').classList.add('show');
+  document.body.classList.add('menu-open');   // hide the Menu button while its dropdown is open
+}
+function closeCatDrawer(){document.getElementById('catDrawerOverlay').classList.remove('show');document.body.classList.remove('menu-open');}
+function gotoCat(cid){closeCatDrawer();if(typeof showTab==='function')showTab('menu');jumpToCat(cid);}
+document.getElementById('catDrawerOverlay').addEventListener('click',e=>{if(e.target.id==='catDrawerOverlay')closeCatDrawer();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCatDrawer();});
 function renderSkeleton(){
   const app=document.getElementById('app');if(!app)return;
   let h='<div class="sk-h"></div>';
@@ -63,22 +77,9 @@ function renderSkeleton(){
   app.innerHTML=h;
 }
 // builds the horizontal category chip strip (name kept as renderChips since it's called throughout)
-function renderChips(){
-  const vcount=c=>c.items.filter(isVisible).length;
-  const total=menu.categories.reduce((a,c)=>a+vcount(c),0);
-  const box=document.getElementById('catChips');
-  if(!box)return;
-  let h='<button type="button" class="catchip'+(activeCat==='ALL'?' active':'')+'" data-cat="ALL">All <span class="n">'+total+'</span></button>';
-  menu.categories.forEach(c=>{if(!manage&&!vcount(c))return;h+='<button type="button" class="catchip'+(activeCat===c.id?' active':'')+'" data-cat="'+c.id+'">'+esc(c.category)+' <span class="n">'+vcount(c)+'</span></button>';});
-  box.innerHTML=h;
-  box.querySelectorAll('.catchip').forEach(op=>op.onclick=()=>{
-    activeCat=op.dataset.cat;
-    if(activeCat!=='ALL')collapsed.delete(activeCat);   // selecting a category opens it
-    renderChips();render();
-    op.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});   // keep the active chip in view
-    if(activeCat!=='ALL'){const el=document.getElementById('c-'+activeCat);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
-  });
-}
+// Category navigation is now the floating "Menu" button (openCategorySheet); kept as a
+// no-op so existing callers stay valid.
+function renderChips(){}
 
 function fmtPrice(p){p=parseInt(p,10)||0;return p>0?'<span class="cur">'+CUR+'</span>'+p:'Price on request';}
 // choices may be plain strings ("Dark") or {name, price} for per-option pricing
@@ -577,10 +578,27 @@ document.getElementById('resetBtn').onclick=()=>{if(!authed){toast('Unlock first
 
 // Back-to-top crown button
 const toTop=document.getElementById('toTop');
-if(toTop){
-  window.addEventListener('scroll',()=>{toTop.classList.toggle('show',window.scrollY>420);},{passive:true});
-  toTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+// Back-to-top button + iOS Instagram-style bottom bar shrink on scroll-down / expand on scroll-up.
+// rAF-throttled, and only writes classes when the state actually flips (keeps the CSS transition buttery).
+const _tabbar=document.querySelector('.tabbar');
+let _lastY=window.scrollY,_navShrunk=false,_ticking=false;
+function _onScroll(){
+  const y=window.scrollY;
+  if(toTop)toTop.classList.toggle('show',y>420);
+  if(_tabbar){
+    let want=_navShrunk;
+    if(y>90&&y>_lastY+4)want=true;              // scrolling down
+    else if(y<_lastY-4||y<40)want=false;        // scrolling up / near top
+    if(want!==_navShrunk){
+      _navShrunk=want;
+      _tabbar.classList.toggle('shrunk',want);
+      document.body.classList.toggle('nav-shrunk',want);
+    }
+  }
+  _lastY=y;_ticking=false;
 }
+window.addEventListener('scroll',()=>{if(!_ticking){_ticking=true;requestAnimationFrame(_onScroll);}},{passive:true});
+if(toTop)toTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 // Interactive mascot — royal greetings
 const GREETINGS=['Welcome to the castle!','Browse the menu & order at the counter','Your royal treat awaits!','Feast like royalty!'];
 let _g=0;
