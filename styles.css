@@ -454,11 +454,12 @@
     border:1px solid rgba(255,255,255,.16);color:#ffd98a;border-radius:26px;
     padding:12px 20px;font-family:var(--sans);font-size:14px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
     box-shadow:0 10px 26px rgba(20,10,4,.4),inset 0 1px 0 rgba(255,255,255,.1);
-    transition:transform .16s ease,opacity .16s ease,bottom .3s cubic-bezier(.22,1,.36,1)}
+    transform-origin:bottom right;will-change:transform;
+    transition:transform .38s cubic-bezier(.25,.9,.3,1),opacity .16s ease,bottom .3s cubic-bezier(.22,1,.36,1)}
   .menu-fab .ico{width:18px;height:18px}
   .menu-fab:active{transform:scale(.95)}
-  /* follow the bottom pill: sit lower when the pill is shrunk */
-  body.nav-shrunk .menu-fab{bottom:calc(84px + env(safe-area-inset-bottom))}
+  /* follow the bottom pill: scale down (like the capsule) and sit lower when the pill is shrunk */
+  body.nav-shrunk .menu-fab{transform:scale(.86);bottom:calc(84px + env(safe-area-inset-bottom))}
   body.manage .menu-fab,body.menu-open .menu-fab{opacity:0;pointer-events:none;transform:scale(.92)}
   /* Category dropdown — anchored to the Menu button, expands upward (bottom→top) */
   .cat-drawer-overlay{position:fixed;inset:0;z-index:52;background:transparent;
