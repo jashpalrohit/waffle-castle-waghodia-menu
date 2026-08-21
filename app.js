@@ -415,6 +415,8 @@ const SITE_DEFAULTS={
   location:'WAGHODIA · VADODARA',
   tagline:'Taste the Royal Waffle',
   subline:'Browse & order at the counter',
+  tickerDine:'🧇 **Dine-in** · Browse the menu here & order at the counter',
+  tickerOnline:'🛵 **Order online** · Now on Zomato · Swiggy · EasyCater',
   contactTitle:'Visit Us',
   phone:'+91 91730 40112',
   whatsapp:'+91 91730 40112',
@@ -424,8 +426,14 @@ const SITE_DEFAULTS={
   mapUrl:'https://www.google.com/maps/dir/?api=1&destination=22.2984426%2C73.2488259&destination_place_id=Waffle+Castle+Vadodara+Waghodia',
   hoursLabel:'Open daily',
   hours:'11:00 AM – 11:00 PM',
-  discTitle:'In-store orders only',
-  discText:'This menu is applicable for **in-store orders only**. Prices are **not applicable** on online ordering platforms like Zomato / Swiggy, etc.'
+  zomatoUrl:'https://zomato.onelink.me/xqzv/xjm5o8ht',
+  zomatoSub:'Order delivery on Zomato',
+  swiggyUrl:'https://www.swiggy.com/menu/1189598?source=sharing',
+  swiggySub:'Order delivery on Swiggy',
+  ezcaterUrl:'https://easycater.linktrace.in/r/0303a7b1',
+  ezcaterSub:'Bulk & catering orders',
+  discTitle:'Prices may vary online',
+  discText:'Menu prices shown here are for **in-store orders**. Rates on online platforms like **Zomato / Swiggy / EasyCater** may differ.'
 };
 const SITE_KEYS=Object.keys(SITE_DEFAULTS);
 function SITE(k){const v=menu&&menu.site&&menu.site[k];return (v!=null&&String(v).trim()!=='')?v:SITE_DEFAULTS[k];}
@@ -444,18 +452,42 @@ function applySiteTexts(){
   const wa=document.getElementById('s_waCard');if(wa)wa.setAttribute('href','https://wa.me/'+digits(SITE('whatsapp')));
   const ig=document.getElementById('s_igCard');if(ig)ig.setAttribute('href',SITE('instaUrl'));
   const dir=document.getElementById('s_dir');if(dir)dir.setAttribute('href',SITE('mapUrl'));
+  // Order-tab platform links + captions (owner-editable)
+  const setHref=(id,v)=>{const el=document.getElementById(id);if(el&&String(v).trim())el.setAttribute('href',v);};
+  setHref('ord_zomato',SITE('zomatoUrl'));setHref('ord_swiggy',SITE('swiggyUrl'));setHref('ord_ezcater',SITE('ezcaterUrl'));
+  set('s_zomatoSub',SITE('zomatoSub'));set('s_swiggySub',SITE('swiggySub'));set('s_ezcaterSub',SITE('ezcaterSub'));
+  // Announcement marquee — rebuilt from editable texts, duplicated for a seamless loop
+  const tk=document.querySelector('.ticker-track');
+  if(tk){
+    const unit='<span class="ti">'+fmtOffer(SITE('tickerDine'))+'</span><span class="tsep">&bull;</span>'+
+               '<span class="ti">'+fmtOffer(SITE('tickerOnline'))+'</span><span class="tsep">&bull;</span>';
+    tk.innerHTML=unit+unit;
+  }
   try{document.title=SITE('brand')+' - Menu';}catch(e){}
 }
-const SITE_FORM=[['brand','Brand name'],['location','Location line'],['tagline','Banner tagline'],['subline','Banner subline'],
-  ['contactTitle','Contact heading'],['phone','Phone (shown)'],['whatsapp','WhatsApp number'],['instaHandle','Instagram handle'],
-  ['instaUrl','Instagram link'],['address','Address',1],['mapUrl','Google Maps link',1],['hoursLabel','Hours label'],
-  ['hours','Hours'],['discTitle','Disclaimer title'],['discText','Disclaimer text (use **bold**)',1]];
-function openSiteEditor(){
+// Page-scoped editors — each popup shows only the texts that live on that page.
+const SITE_FORM={
+  contact:[['brand','Brand name'],['location','Location line'],['tagline','Banner tagline'],['subline','Banner subline'],
+    ['tickerDine','Marquee — dine-in text (use **bold**)',1],['tickerOnline','Marquee — online text (use **bold**)',1],
+    ['contactTitle','Contact heading'],['phone','Phone (shown)'],['whatsapp','WhatsApp number'],['instaHandle','Instagram handle'],
+    ['instaUrl','Instagram link'],['address','Address',1],['mapUrl','Google Maps link',1],['hoursLabel','Hours label'],['hours','Hours']],
+  order:[['zomatoUrl','Zomato link'],['zomatoSub','Zomato caption'],
+    ['swiggyUrl','Swiggy link'],['swiggySub','Swiggy caption'],
+    ['ezcaterUrl','EasyCater link'],['ezcaterSub','EasyCater caption'],
+    ['discTitle','Note title'],['discText','Note text (use **bold**)',1]]
+};
+const SITE_EDITOR_META={
+  contact:{title:'Edit Contact page',hint:'Updates the header, banner and contact page for everyone. Menu items &amp; offers are edited from their own cards.'},
+  order:{title:'Edit Order page',hint:'Updates the note shown on the Order tab for everyone.'}
+};
+function openSiteEditor(page){
   if(!authed){openAuth();return;}
-  const fields=SITE_FORM.map(([k,label,ta])=>'<div class="fld"><label>'+label+'</label>'+
+  page=SITE_FORM[page]?page:'contact';
+  const meta=SITE_EDITOR_META[page];
+  const fields=SITE_FORM[page].map(([k,label,ta])=>'<div class="fld"><label>'+label+'</label>'+
     (ta?'<textarea id="st_'+k+'">'+esc(SITE(k))+'</textarea>':'<input id="st_'+k+'" value="'+esc(SITE(k))+'">')+'</div>').join('');
-  openSheet('<h3>Edit page texts</h3>'+fields+
-    '<small class="fhint">These update the header, banner and contact page for everyone. Menu items &amp; offers are edited from their own cards.</small>'+
+  openSheet('<h3>'+meta.title+'</h3>'+fields+
+    '<small class="fhint">'+meta.hint+'</small>'+
     '<div class="sheet-actions"><button class="cancel" onclick="closeSheet()">Cancel</button><button class="save" onclick="saveSite()">Save</button></div>');
 }
 function saveSite(){
@@ -613,8 +645,8 @@ if(mascot)mascot.onclick=()=>{toast(GREETINGS[_g++%GREETINGS.length]);};
 
 const _yr=document.getElementById('year');if(_yr)_yr.textContent=new Date().getFullYear();
 
-// ---- Bottom tab navigation (Menu / Offers / Contact) ----
-const TABS=['menu','offers','contact'];
+// ---- Bottom tab navigation (Menu / Order / Offers / Contact) ----
+const TABS=['menu','order','offers','contact'];
 function showTab(name){
   if(TABS.indexOf(name)<0)name='menu';
   TABS.forEach(t=>{
@@ -625,7 +657,7 @@ function showTab(name){
     const on=b.dataset.tab===name;
     b.classList.toggle('active',on);b.setAttribute('aria-selected',on?'true':'false');
   });
-  document.body.classList.remove('tab-menu','tab-offers','tab-contact');
+  document.body.classList.remove('tab-menu','tab-order','tab-offers','tab-contact');
   document.body.classList.add('tab-'+name);
   window.scrollTo({top:0,behavior:'auto'});
 }
