@@ -3,7 +3,8 @@
 -- Run once in Supabase → SQL Editor → New query → Run.
 -- Safe to re-run: every statement is idempotent.
 --
--- Owner only: every table is readable and writable only by the owner account
+-- Open access (no login): anyone with the /inventory link can read and change inventory.
+-- (The menu editor and attendance owner pages still need the owner login.)
 -- (the same login as the menu and attendance). Nothing here is public.
 --
 --   inv_suppliers  who you buy from
@@ -99,23 +100,23 @@ language sql stable set search_path = '' as $$
   select coalesce(auth.jwt() ->> 'email', '') = 'jashpalrohit002@gmail.com'
 $$;
 
--- ---- Row Level Security: owner only ----
+-- ---- Row Level Security: open to everyone (the page needs no login) ----
 alter table public.inv_suppliers enable row level security;
 alter table public.inv_items     enable row level security;
 alter table public.inv_moves     enable row level security;
-revoke all on public.inv_suppliers, public.inv_items, public.inv_moves from anon;
+grant select, insert, update, delete on public.inv_suppliers, public.inv_items, public.inv_moves to anon, authenticated;
 
 drop policy if exists inv_suppliers_owner on public.inv_suppliers;
-create policy inv_suppliers_owner on public.inv_suppliers for all to authenticated
-  using (public.inv_is_owner()) with check (public.inv_is_owner());
+drop policy if exists inv_suppliers_open on public.inv_suppliers;
+create policy inv_suppliers_open on public.inv_suppliers for all to anon, authenticated using (true) with check (true);
 
 drop policy if exists inv_items_owner on public.inv_items;
-create policy inv_items_owner on public.inv_items for all to authenticated
-  using (public.inv_is_owner()) with check (public.inv_is_owner());
+drop policy if exists inv_items_open on public.inv_items;
+create policy inv_items_open on public.inv_items for all to anon, authenticated using (true) with check (true);
 
 drop policy if exists inv_moves_owner on public.inv_moves;
-create policy inv_moves_owner on public.inv_moves for all to authenticated
-  using (public.inv_is_owner()) with check (public.inv_is_owner());
+drop policy if exists inv_moves_open on public.inv_moves;
+create policy inv_moves_open on public.inv_moves for all to anon, authenticated using (true) with check (true);
 
 -- ---- Daily count: save one day of the register in a single step ----
 -- p_rows: [{item_id, purchased, wastage, used, unit_cost}] — used = previous stock + purchased − wastage − closing,
@@ -128,7 +129,6 @@ declare
   r jsonb; n int := 0;
   v_item uuid; v_p numeric; v_w numeric; v_used numeric; v_cost numeric; v_sup uuid;
 begin
-  if not public.inv_is_owner() then raise exception 'Only the owner can edit inventory' using errcode = '42501'; end if;
   if p_day > (now() at time zone 'Asia/Kolkata')::date then raise exception 'The date cannot be in the future'; end if;
   for r in select * from jsonb_array_elements(coalesce(p_rows, '[]'::jsonb)) loop
     v_item := (r ->> 'item_id')::uuid;
@@ -162,8 +162,7 @@ begin
   end loop;
   return n;
 end $$;
-revoke all on function public.inv_save_day(date, jsonb) from public, anon;
-grant execute on function public.inv_save_day(date, jsonb) to authenticated;
+grant execute on function public.inv_save_day(date, jsonb) to anon, authenticated;
 
 -- ---- Usage from Petpooja orders: record one day in a single step ----
 -- p_rows: [{item_id, qty}] — items used by that day's orders (packaging, water bottles …).
@@ -172,7 +171,6 @@ create or replace function public.inv_record_orders(p_day date, p_rows jsonb) re
 language plpgsql set search_path = '' as $$
 declare r jsonb; n int := 0; v_qty numeric;
 begin
-  if not public.inv_is_owner() then raise exception 'Only the owner can edit inventory' using errcode = '42501'; end if;
   if p_day > (now() at time zone 'Asia/Kolkata')::date then raise exception 'The date cannot be in the future'; end if;
   delete from public.inv_moves where moved_on = p_day and source = 'orders';
   for r in select * from jsonb_array_elements(coalesce(p_rows, '[]'::jsonb)) loop
@@ -184,5 +182,4 @@ begin
   end loop;
   return n;
 end $$;
-revoke all on function public.inv_record_orders(date, jsonb) from public, anon;
-grant execute on function public.inv_record_orders(date, jsonb) to authenticated;
+grant execute on function public.inv_record_orders(date, jsonb) to anon, authenticated;

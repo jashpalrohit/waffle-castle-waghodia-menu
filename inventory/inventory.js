@@ -2,7 +2,7 @@
 const SUPABASE_URL='https://pyhtrkylkykqwklrzitm.supabase.co';
 const SUPABASE_KEY='sb_publishable_th2b-0LngMIeET39bLchaA_RacvqIZ-';
 const OWNER_EMAIL='jashpalrohit002@gmail.com';
-// ▲▲▲ Tables are created by inventory/schema.sql ▲▲▲
+// ▲▲▲ Tables are created by inventory/schema.sql — open access, no login needed ▲▲▲
 let sb=null;
 try{sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);}catch(e){}
 
@@ -73,7 +73,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet();});
 // Owner login (same Supabase account as the menu and attendance)
 // ============================================================
 function reflectAuth(){
-  const b=document.getElementById('authBtn');
+  const b=document.getElementById('authBtn');if(!b)return;   // no lock button: inventory is open
   b.innerHTML=authed?IC.unlock:IC.lock;b.classList.toggle('on',authed);
   b.title=authed?'Owner: logged in (tap to lock)':'Owner login';b.setAttribute('aria-label',b.title);
 }
@@ -92,7 +92,7 @@ async function tryAuth(){
   toast('Unlocked');
 }
 async function lock(){try{await sb.auth.signOut();}catch(e){}toast('Locked');}
-document.getElementById('authBtn').onclick=()=>{if(authed)lock();else{const p=document.getElementById('f_pass');if(p)p.focus();}};
+if(document.getElementById('authBtn'))document.getElementById('authBtn').onclick=()=>{if(authed)lock();else{const p=document.getElementById('f_pass');if(p)p.focus();}};
 async function setAuthed(v){
   if(v===authed)return;
   authed=v;reflectAuth();items=[];sups=[];moves=[];movesKey='';
@@ -1043,9 +1043,8 @@ async function boot(){
   reflectAuth();
   if(!sb){document.getElementById('stockWrap').innerHTML='<div class="att-empty">Could not load the app. Check your internet connection and refresh.</div>';return;}
   document.getElementById('stockWrap').innerHTML=skeleton();
-  // owner only (the session is shared with the menu site on the same domain)
-  sb.auth.onAuthStateChange((_e,session)=>setAuthed(!!(session&&session.user&&session.user.email===OWNER_EMAIL)));
-  let ok=false;try{const {data}=await sb.auth.getSession();const s=data&&data.session;ok=!!(s&&s.user&&s.user.email===OWNER_EMAIL);}catch(e){}
-  if(ok)await setAuthed(true);else renderTab();
+  // Inventory is open to anyone with the link — no login (see schema.sql). The header lock button is hidden.
+  const b=document.getElementById('authBtn');if(b)b.remove();
+  await setAuthed(true);
 }
 boot();
