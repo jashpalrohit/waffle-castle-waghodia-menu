@@ -93,6 +93,15 @@ async function tryAuth(){
   toast('Unlocked');
 }
 async function lock(){try{await sb.auth.signOut();}catch(e){}toast('Locked');}
+// Suppliers are owner-only (same Supabase account as the menu editor); the rest of the inventory is open.
+let ownerIn=false;
+const isOwnerSession=s=>!!(s&&s.user&&(s.user.email||'').toLowerCase()===OWNER_EMAIL);
+function supplierLogin(){
+  return '<div class="page-head">'+IC.truck+'<h2>Suppliers</h2></div>'+
+    '<div class="att-card att-login"><p>Suppliers are for the owner only. Log in with the same password as the menu.</p>'+
+    '<div class="fld"><label>Password</label><input id="f_pass" type="password" placeholder="Enter password" autocomplete="current-password" onkeydown="if(event.key===\'Enter\')tryAuth()"></div>'+
+    '<div class="sheet-actions"><button class="save" id="loginBtn" onclick="tryAuth()">Unlock</button></div></div>';
+}
 if(document.getElementById('authBtn'))document.getElementById('authBtn').onclick=()=>{if(authed)lock();else{const p=document.getElementById('f_pass');if(p)p.focus();}};
 async function setAuthed(v){
   if(v===authed)return;
@@ -339,7 +348,7 @@ function moveForm(kind,itemId,moveId){
       '<div class="fld two"><div><label>Price per unit (₹)</label><input id="m_cost" type="number" min="0" step="any" inputmode="decimal" value="'+(m&&m.unit_cost!=null?Number(m.unit_cost):'')+'" oninput="moveTotal()"></div>'+
         '<div><label>Total (₹)</label><input id="m_total" type="number" min="0" step="any" inputmode="decimal" oninput="moveTotalChanged()" placeholder="or enter the bill total"></div></div>'+
       '<div class="fld"><label>Supplier</label><select id="m_sup" onchange="if(this.value===\'__new\')quickSupplier()"><option value="">None</option>'+
-        sups.map(s=>'<option value="'+s.id+'">'+esc(s.name)+'</option>').join('')+'<option value="__new">+ New supplier…</option></select></div>':'')+
+        sups.map(s=>'<option value="'+s.id+'">'+esc(s.name)+'</option>').join('')+(ownerIn?'<option value="__new">+ New supplier…</option>':'')+'</select></div>':'')+
     '<div class="fld two"><div><label>Date</label><input id="m_date" type="date" max="'+today()+'" value="'+(m?m.moved_on:today())+'"></div>'+
       '<div><label>Note (optional)</label><input id="m_note" value="'+esc(m?m.note:'')+'" placeholder="'+(kind==='in'?'Bill no., brand…':kind==='waste'?'Expired, spilled…':'')+'"></div></div>'+
     '<div class="sheet-actions">'+(m?'<button class="cancel danger" onclick="delMove('+m.id+')">Delete</button>':'<button class="cancel" onclick="closeSheet()">Cancel</button>')+
@@ -1095,6 +1104,7 @@ function exportCSV(){
 function renderSuppliers(){
   const w=document.getElementById('suppliersWrap');
   if(!authed){w.innerHTML=loginCard();return;}
+  if(!ownerIn){w.innerHTML=supplierLogin();return;}
   if(baseErr){w.innerHTML='<div class="page-head">'+IC.truck+'<h2>Suppliers</h2></div><div class="att-empty">'+esc(baseErr)+'</div>';return;}
   const list=sups.map(s=>{
     const its=items.filter(i=>i.supplier_id===s.id&&i.active);
@@ -1104,7 +1114,7 @@ function renderSuppliers(){
         '<small>'+(its.length?'Supplies: <b class="sal">'+its.map(i=>esc(i.name)).join(', ')+'</b>':'Not the usual supplier for any item')+'</small></span>'+
       '<span class="c-go">'+IC.next+'</span></button>';
   }).join('');
-  w.innerHTML='<div class="page-head">'+IC.truck+'<h2>Suppliers</h2><span class="att-count">'+sups.length+'</span></div>'+
+  w.innerHTML='<div class="page-head">'+IC.truck+'<h2>Suppliers</h2><span class="att-count">'+sups.length+'</span><button type="button" class="mini sup-out" onclick="lock()">'+IC.unlock+' Log out</button></div>'+
     '<div class="contact-cards">'+(list||'<div class="att-empty">No suppliers yet.</div>')+
     '<button class="att-btn" onclick="supplierForm()">'+IC.plus+' Add supplier</button></div>';
 }
@@ -1223,5 +1233,8 @@ async function boot(){
   // Inventory is open to anyone with the link — no login (see schema.sql). The header lock button is hidden.
   const b=document.getElementById('authBtn');if(b)b.remove();
   await setAuthed(true);
+  try{const {data}=await sb.auth.getSession();ownerIn=isOwnerSession(data&&data.session);}catch(e){}
+  sb.auth.onAuthStateChange((ev,ses)=>{const v=isOwnerSession(ses);if(v===ownerIn)return;ownerIn=v;if(tab==='suppliers'){closeSheet();renderSuppliers();}});
+  if(tab==='suppliers')renderSuppliers();
 }
 boot();

@@ -243,6 +243,7 @@
     background:var(--amber);color:#231600;box-shadow:0 4px 12px rgba(255,143,0,.3);letter-spacing:.3px;text-transform:uppercase}
   .dc-save .save:disabled{opacity:.45;cursor:default;box-shadow:none}
 
+  .sup-out{margin-left:auto;display:inline-flex;align-items:center;gap:5px}
   /* Purchase */
   .dcu-info b.bad{color:#c2410c}
   .pur-q{color:#1b7f3a;white-space:nowrap}

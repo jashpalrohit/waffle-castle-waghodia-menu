@@ -108,7 +108,11 @@ grant select, insert, update, delete on public.inv_suppliers, public.inv_items, 
 
 drop policy if exists inv_suppliers_owner on public.inv_suppliers;
 drop policy if exists inv_suppliers_open on public.inv_suppliers;
-create policy inv_suppliers_open on public.inv_suppliers for all to anon, authenticated using (true) with check (true);
+drop policy if exists inv_suppliers_read on public.inv_suppliers;
+drop policy if exists inv_suppliers_owner_write on public.inv_suppliers;
+-- Suppliers: everyone can read the names (Daily / History show them); only the owner can add, edit or delete
+create policy inv_suppliers_read on public.inv_suppliers for select to anon, authenticated using (true);
+create policy inv_suppliers_owner_write on public.inv_suppliers for all to authenticated using (public.inv_is_owner()) with check (public.inv_is_owner());
 
 drop policy if exists inv_items_owner on public.inv_items;
 drop policy if exists inv_items_open on public.inv_items;
