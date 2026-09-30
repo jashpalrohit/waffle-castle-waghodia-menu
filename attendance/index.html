@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1c0f07">
+<meta name="robots" content="noindex, nofollow">
+<title>Waffle Castle - Staff Attendance</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=20260928d">
+<link rel="stylesheet" href="attendance.css?v=20260930late">
+</head>
+<body class="tab-punch">
+<header>
+  <div class="head-row">
+    <div class="logo"><img src="logo.png" alt="Waffle Castle"></div>
+    <div class="brand"><h1>Waffle Castle</h1><small>STAFF ATTENDANCE</small></div>
+    <div class="sp"></div>
+    <button class="gear att-auth" id="authBtn" type="button" title="Owner login" aria-label="Owner login"></button>
+  </div>
+</header>
+
+<section class="tab-panel active" id="tab-punch" role="tabpanel" aria-label="Punch in / out">
+  <div class="att-hero">
+    <div class="att-hero-txt">
+      <div class="att-clock" id="clock">--:--</div>
+      <div class="att-date" id="today"></div>
+    </div>
+    <span class="spark s1">&#10022;</span><span class="spark s2">&#10022;</span><span class="spark s3">&#10022;</span>
+  </div>
+  <div class="page-head"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg><h2>Tap your name</h2><span class="att-count" id="onShift"></span></div>
+  <div class="att-wrap"><div class="k-grid" id="kioskGrid"></div></div>
+</section>
+
+<section class="tab-panel" id="tab-calendar" role="tabpanel" aria-label="Calendar" aria-hidden="true">
+  <div class="att-wrap" id="calendarWrap"></div>
+</section>
+
+<section class="tab-panel" id="tab-staff" role="tabpanel" aria-label="Staff" aria-hidden="true">
+  <div class="att-wrap" id="staffWrap"></div>
+</section>
+
+<nav class="tabbar" role="tablist" aria-label="Sections">
+  <button class="tabbtn active" data-tab="punch" role="tab" aria-selected="true"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg><span>Punch</span></button>
+  <button class="tabbtn" data-tab="calendar" role="tab" aria-selected="false"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Calendar</span></button>
+  <button class="tabbtn" data-tab="staff" role="tab" aria-selected="false"><svg class="ico" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/></svg><span>Staff</span></button>
+</nav>
+
+<div class="overlay" id="overlay"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
+<script src="attendance.js?v=20260930late"></script>
+</body>
+</html>
