@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1c0f07">
+<meta name="robots" content="noindex, nofollow">
+<title>Waffle Castle - Inventory</title>
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Geist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Same theme as the menu; cards, tables and buttons are shared with the attendance section -->
+<link rel="stylesheet" href="../styles.css?v=20260928d">
+<link rel="stylesheet" href="../attendance/attendance.css?v=20260930late">
+<link rel="stylesheet" href="inventory.css?v=20260930sup3">
+</head>
+<body class="tab-stock">
+<header>
+  <div class="head-row">
+    <div class="logo"><img src="logo.png" alt="Waffle Castle"></div>
+    <div class="brand"><h1>Waffle Castle</h1><small>INVENTORY</small></div>
+    <div class="sp"></div>
+    <button class="gear att-auth" id="authBtn" type="button" title="Owner login" aria-label="Owner login"></button>
+  </div>
+</header>
+
+<section class="tab-panel active" id="tab-stock" role="tabpanel" aria-label="Stock"><div class="att-wrap" id="stockWrap"></div></section>
+<section class="tab-panel" id="tab-daily" role="tabpanel" aria-label="Daily count" aria-hidden="true"><div class="att-wrap" id="dailyWrap"></div></section>
+<section class="tab-panel" id="tab-history" role="tabpanel" aria-label="History" aria-hidden="true"><div class="att-wrap" id="historyWrap"></div></section>
+<section class="tab-panel" id="tab-report" role="tabpanel" aria-label="Report" aria-hidden="true"><div class="att-wrap" id="reportWrap"></div></section>
+<section class="tab-panel" id="tab-suppliers" role="tabpanel" aria-label="Suppliers" aria-hidden="true"><div class="att-wrap" id="suppliersWrap"></div></section>
+
+<nav class="tabbar" role="tablist" aria-label="Sections">
+  <button class="tabbtn active" data-tab="stock" role="tab" aria-selected="true"><svg class="ico" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/></svg><span>Stock</span><i class="tab-dot" id="lowDot"></i></button>
+  <button class="tabbtn" data-tab="daily" role="tab" aria-selected="false"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 3v2h8V3"/><polyline points="8.5 12 10.5 14 15.5 9"/><line x1="8" y1="18" x2="16" y2="18"/></svg><span>Daily</span></button>
+  <button class="tabbtn" data-tab="history" role="tab" aria-selected="false"><svg class="ico" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><polyline points="3 3 3 8 8 8"/><polyline points="12 7 12 12 15 14"/></svg><span>History</span></button>
+  <button class="tabbtn" data-tab="report" role="tab" aria-selected="false"><svg class="ico" viewBox="0 0 24 24"><line x1="4" y1="20" x2="20" y2="20"/><rect x="6" y="11" width="3" height="7"/><rect x="11" y="6" width="3" height="12"/><rect x="16" y="14" width="3" height="4"/></svg><span>Report</span></button>
+  <button class="tabbtn" data-tab="suppliers" role="tab" aria-selected="false"><svg class="ico" viewBox="0 0 24 24"><rect x="1" y="6" width="14" height="11" rx="1"/><path d="M15 10h4l3 3v4h-7z"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg><span>Suppliers</span></button>
+</nav>
+
+<div class="overlay" id="overlay"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<datalist id="catList"></datalist>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.min.js"></script>
+<!-- Reading Petpooja exports (Daily → From Petpooja orders): Excel reader, menu categories, packaging rules -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="../menu-data.js?v=20260930d"></script>
+<script src="packaging.js?v=20260930d"></script>
+<script src="inventory.js?v=20260930sup3"></script>
+</body>
+</html>
