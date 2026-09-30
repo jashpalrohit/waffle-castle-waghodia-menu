@@ -60,6 +60,7 @@ const IC={
   alert:'<svg class="ico" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></svg>',
   check:'<svg class="ico" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 3v2h8V3"/><polyline points="8.5 12 10.5 14 15.5 9"/></svg>',
   cal:'<svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+  cart:'<svg class="ico" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.4a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.5L21 8H6"/></svg>',
   rupee:'<svg class="ico" viewBox="0 0 24 24"><path d="M6 3h12M6 8h12M6 13l8.5 8M6 13h3a5 5 0 0 0 0-10"/></svg>'
 };
 
@@ -407,7 +408,7 @@ function moveRow(m,showItem){
   const total=m.kind==='in'&&m.unit_cost!=null?Number(m.unit_cost)*Number(m.qty):null;
   (window._detailMoves=window._detailMoves||[]).push(m);
   return '<button type="button" class="inv-move" onclick="closeSheet();moveForm(null,null,'+m.id+')">'+
-    '<span class="kchip '+m.kind+'">'+KINDS[m.kind].label+(m.source&&m.source!=='manual'?'<i>'+({daily:'Daily',import:'Excel',orders:'Orders'}[m.source]||'')+'</i>':'')+'</span>'+
+    '<span class="kchip '+m.kind+'">'+KINDS[m.kind].label+(m.source&&m.source!=='manual'?'<i>'+({daily:'Daily',import:'Excel',orders:'Orders',purchase:'Upload'}[m.source]||'')+'</i>':'')+'</span>'+
     '<span class="mv-main">'+(showItem?'<b>'+esc(it?it.name:'(deleted item)')+'</b>':'<b>'+fmtDay(m.moved_on)+'</b>')+
       '<small>'+[showItem?'':null,s?s.name:'',m.unit_cost!=null?rupees(m.unit_cost)+'/'+esc(it?it.unit:''):'',m.note].filter(Boolean).map(esc).join(' · ')+'</small></span>'+
     '<span class="mv-qty '+(sq<0?'neg':'pos')+'">'+(sq>0?'+':'−')+num(Math.abs(sq))+' '+esc(it?it.unit:'')+(total!=null?'<small>'+rupees0(total)+'</small>':'')+'</span></button>';
@@ -431,8 +432,8 @@ async function loadDay(k){
     d.opening[m.item_id]-=signedQty(m);              // back out everything from this day onwards
     if(m.moved_on!==k)return;
     if(m.source==='orders'&&m.kind==='out')d.orders[m.item_id]=(d.orders[m.item_id]||0)+Number(m.qty);
-    if(m.source==='manual'&&m.kind==='in')d.buy[m.item_id]=(d.buy[m.item_id]||0)+Number(m.qty);
-    if(m.source==='manual'||m.source==='orders'){d.other[m.item_id]+=signedQty(m);return;}   // register rows = 'daily' + imported Excel days
+    if((m.source==='manual'||m.source==='purchase')&&m.kind==='in')d.buy[m.item_id]=(d.buy[m.item_id]||0)+Number(m.qty);
+    if(m.source==='manual'||m.source==='orders'||m.source==='purchase'){d.other[m.item_id]+=signedQty(m);return;}   // register rows = 'daily' + imported Excel days
     const q=Number(m.qty),id=m.item_id;
     if(m.kind==='in')d.p[id]=(d.p[id]||0)+q;
     else if(m.kind==='waste')d.w[id]=(d.w[id]||0)+q;
@@ -460,7 +461,7 @@ async function renderDaily(){
       '<div class="cal-title dp-wrap"><button type="button" class="day-pick" onclick="toggleDayPicker(event)" aria-haspopup="dialog">'+IC.cal+' '+esc(fmtDay(dayK))+'</button>'+
         '<div class="dp-pop" id="dpPop" hidden role="dialog" aria-label="Choose a date"></div></div>'+
       '<button type="button" class="cal-nav" aria-label="Next day" onclick="shiftDay(1)"'+(dayK>=today()?' disabled':'')+'>'+IC.next+'</button></div>'+
-    ordersBar();
+    ordersBar()+purchaseBar();
   if(!day||day.k!==dayK){
     w.innerHTML=head+skeleton();
     try{day=await loadDay(dayK);}catch(e){w.innerHTML=head+'<div class="att-empty">'+esc(dbErr(e))+'</div>';return;}
@@ -515,7 +516,7 @@ function dayParts(i){
   const inp=(f,v,ph)=>'<input id="d'+f+'_'+id+'" type="number" min="0" step="any" inputmode="decimal" value="'+(v==null?'':v)+'" placeholder="'+ph+'" oninput="dayInput(\''+id+'\')">';
   const closing=locked?'<span class="dc-lockbox"><input id="dc_'+id+'" type="number" min="0" step="any" inputmode="decimal" value="'+c+'" readonly tabindex="-1" class="locked" oninput="dayInput(\''+id+'\')" title="Filled from Petpooja orders">'+
       '<button type="button" class="dc-lockbtn" id="dl_'+id+'" onclick="event.preventDefault();toggleLock(\''+id+'\')" title="Unlock to change the closing" aria-label="Lock or unlock closing">'+IC.lock+'</button></span>':inp('c',c,'count');
-  const bought=buy?'<small class="dc-buy">+'+num(buy)+' Stock tab</small>':'';
+  const bought=buy?'<small class="dc-buy">+'+num(buy)+' Purchase</small>':'';
   const note=(locked?' <span class="dc-otag">'+IC.lock+' Orders −'+num(ordQ)+'</span>':'')+(rest?' <span class="dc-oth">'+(rest>0?'+':'−')+num(Math.abs(rest))+' other</span>':'');
   return {id,o,oShow,locked,p:inp('p',p,'0')+bought,w:inp('w',wv,'0'),closing,note,rest,ordQ};
 }
@@ -827,8 +828,171 @@ async function renderHistory(){
 }
 
 // ============================================================
+// Daily → Purchases upload — purchases for one or many days from an Excel sheet in the same layout as the
+// stock register (one sheet per month named like "September 2026"; Category · Vendor · Material Name,
+// then a group of columns per day with a "Stock purchased" column — or just one purchase column per day).
+// Recorded as 'in' entries (source 'purchase') by inv_record_purchases, which replaces the Excel purchases
+// of every date the sheet covers, so uploading the same sheet again simply updates it.
+// Shown on the Daily count as part of Opening (“+x Purchase”) and added to In stock.
+// ============================================================
+const pur={file:'',res:null,busy:false};
+const normName=s=>String(s==null?'':s).replace(/\s+/g,' ').trim().toLowerCase();
+// workbook → {days:{'YYYY-MM-DD':[{item, qty, supplier_id, unit_cost}]}, covered:[dates], unmatched:{name:qty}, sheets:[names], future}
+function purchaseAnalyse(wb){
+  const byName={};items.forEach(i=>{byName[normName(i.name)]=i;});
+  const supByName={};sups.forEach(s=>{supByName[normName(s.name)]=s;});
+  const MON=MONTHS.map(m=>m.toLowerCase());
+  const days={},covered=new Set(),unmatched={},used=[];let future=0;
+  const add=(k,it,q,vendor)=>{const list=days[k]||(days[k]=[]);let r=list.find(x=>x.item.id===it.id);
+    if(!r){const s=supByName[normName(vendor)];list.push(r={item:it,qty:0,supplier_id:s?s.id:it.supplier_id||null,unit_cost:it.last_cost!=null?Number(it.last_cost):null});}
+    r.qty=r3(r.qty+q);};
+  wb.SheetNames.forEach(sn=>{
+    const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:null});
+    const h=rows.slice(0,10).findIndex(r=>r&&r.some(c=>normName(c)==='material name'));if(h<0)return;
+    const H=rows[h].map(normName),nameC=H.indexOf('material name'),vendC=H.indexOf('vendor');
+    const m=String(sn).trim().match(/^([a-z]+)\s+(\d{4})$/i),mi=m?MON.indexOf(m[1].toLowerCase()):-1;
+    // day labels in the header row: "1st", "2", or a real date
+    const dayAt={};
+    rows[h].forEach((c,j)=>{
+      if(j<=nameC||c==null)return;
+      if(typeof c==='number'&&c>30000){const d=XLSX.SSF.parse_date_code(c);dayAt[j]=d.y+'-'+pad(d.m)+'-'+pad(d.d);return;}
+      const x=String(c).trim().match(/^(\d{1,2})(st|nd|rd|th)?$/i);
+      if(x&&mi>=0&&+x[1]>=1&&+x[1]<=new Date(+m[2],mi+1,0).getDate())dayAt[j]=m[2]+'-'+pad(mi+1)+'-'+pad(+x[1]);
+    });
+    if(!Object.keys(dayAt).length)return;
+    const sub=(rows[h+1]||[]).map(normName),hasSub=sub.some(c=>/purchas/.test(c));
+    const cols=[];let cur=null;
+    for(let j=nameC+1;j<Math.max(rows[h].length,sub.length);j++){
+      if(dayAt[j])cur=dayAt[j];
+      if(!cur)continue;
+      if(hasSub?/purchas/.test(sub[j]||''):dayAt[j])cols.push([j,cur]);
+    }
+    if(!cols.length)return;
+    used.push(sn);
+    cols.forEach(([,k])=>{if(k>today())future++;else covered.add(k);});
+    rows.slice(h+(hasSub?2:1)).forEach(r=>{
+      if(!r||r[nameC]==null||String(r[nameC]).trim()==='')return;
+      const name=String(r[nameC]).replace(/\s+/g,' ').trim(),it=byName[normName(name)];
+      cols.forEach(([j,k])=>{
+        const q=Number(r[j]);if(!(q>0)||k>today())return;
+        if(!it){unmatched[name]=r3((unmatched[name]||0)+q);return;}
+        add(k,it,q,vendC>=0?r[vendC]:'');
+      });
+    });
+  });
+  return {days,covered:[...covered].sort(),unmatched,sheets:used,future};
+}
+async function purchaseLoad(file){
+  if(!file)return;
+  if(!window.XLSX)return toast('Could not load the Excel reader — check your internet connection',true);
+  try{
+    const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});
+    const res=purchaseAnalyse(wb);
+    if(!res.sheets.length)return toast('No sheet with a “Material Name” column and day columns was found',true);
+    if(!res.covered.length)return toast('This sheet only has future dates — nothing to record',true);
+    pur.res=res;pur.file=file.name;renderDaily();
+    const n=Object.values(res.days).reduce((a,l)=>a+l.length,0);
+    toast(n?'Loaded '+n+' purchase'+(n===1?'':'s')+' — check and press Submit':'No purchases (all 0) in this file');
+  }catch(e){toast(e.message||String(e),true);}
+}
+function purchaseClear(){pur.res=null;pur.file='';renderDaily();}
+async function purchaseSubmit(){
+  const res=pur.res;if(!res||pur.busy)return;
+  const rows=Object.entries(res.days).flatMap(([k,l])=>l.map(r=>({item_id:r.item.id,day:k,qty:r.qty,unit_cost:r.unit_cost,supplier_id:r.supplier_id})));
+  const span=fmtDay(res.covered[0])+(res.covered.length>1?' – '+fmtDay(res.covered[res.covered.length-1]):'');
+  if(!confirmLeaveDay())return;
+  if(!confirm('Record '+rows.length+' purchase'+(rows.length===1?'':'s')+' for '+span+'?\nExcel purchases already uploaded for these dates are replaced.'))return;
+  pur.busy=true;const b=document.getElementById('purSubmit');if(b){b.disabled=true;b.textContent='Saving…';}
+  const {data,error}=await sb.rpc('inv_record_purchases',{p_days:res.covered,p_rows:rows});
+  pur.busy=false;
+  if(error){if(b){b.disabled=false;b.innerHTML=IC.check+' Submit';}return toast(dbErr(error),true);}
+  toast('Recorded '+(data||0)+' purchase'+(data===1?'':'s')+' — stock updated');
+  pur.res=null;pur.file='';
+  dayDirty=new Set();dayK=res.covered[res.covered.length-1];day=null;   // show the (last) day from the file
+  await afterChange();
+}
+function purchasePreview(){
+  const res=pur.res;if(!res)return '';
+  const dayKeys=Object.keys(res.days).sort().reverse(),n=dayKeys.reduce((a,k)=>a+res.days[k].length,0);
+  const est=dayKeys.reduce((a,k)=>a+res.days[k].reduce((b,r)=>b+(r.unit_cost!=null?r.qty*r.unit_cost:0),0),0);
+  const unm=Object.entries(res.unmatched);
+  const span=fmtDay(res.covered[0])+(res.covered.length>1?' – '+fmtDay(res.covered[res.covered.length-1]):'');
+  const table=l=>'<div class="tbl-scroll"><table class="att-table"><thead><tr><th>Sr.</th><th>Item</th><th class="num">Qty</th><th>Supplier</th><th class="num">Price</th><th class="num">Total</th></tr></thead><tbody>'+
+    l.slice().sort((a,b)=>a.item.name.localeCompare(b.item.name)).map((r,k)=>{const s=supById(r.supplier_id);
+      return '<tr><td>'+(k+1)+'</td><td><b>'+esc(r.item.name)+'</b><small class="tshift">'+esc(r.item.category||'Other')+'</small></td><td class="num"><b class="pur-q">+'+qty(r.qty,r.item.unit)+'</b></td>'+
+        '<td>'+esc(s?s.name:'—')+'</td><td class="num">'+(r.unit_cost!=null?rupees(r.unit_cost)+'/'+esc(r.item.unit):'—')+'</td><td class="num pay">'+(r.unit_cost!=null?rupees0(r.qty*r.unit_cost):'—')+'</td></tr>';}).join('')+'</tbody></table></div>';
+  return '<div class="inv-sumline"><span><b>'+n+'</b> purchase'+(n===1?'':'s')+' on <b>'+dayKeys.length+'</b> day'+(dayKeys.length===1?'':'s')+'</span><span>'+esc(span)+(est?' · approx '+rupees0(est)+' at last price':'')+'</span></div>'+
+    (unm.length?'<div class="att-card pur-warn">'+IC.alert+'<div><b>'+unm.length+' name'+(unm.length===1?'':'s')+' not found in inventory — skipped:</b> '+
+      unm.map(([nm,q])=>esc(nm)+' ('+num(q)+')').join(', ')+'<small>Add them on the Stock tab (same spelling) and upload again.</small></div></div>':'')+
+    (dayKeys.length?dayKeys.map((k,x)=>'<details class="att-card hist-week"'+(x===0?' open':'')+'><summary><span class="hw-ic">'+IC.cal+'</span><span class="hw-title">'+esc(fmtDay(k))+'</span>'+
+      '<span class="hw-meta">'+res.days[k].length+' item'+(res.days[k].length===1?'':'s')+'</span><span class="hw-chev">'+IC.next+'</span></summary>'+table(res.days[k])+'</details>').join('')
+      :'<div class="att-empty">No purchases above 0 in this file. Submitting clears Excel purchases for '+esc(span)+'.</div>')+
+    (res.future?'<p class="att-foot">'+res.future+' future date column'+(res.future===1?'':'s')+' ignored.</p>':'');
+}
+// Upload + Submit bar at the top of the Daily count (next to Petpooja orders)
+function purchaseBar(){
+  const res=pur.res,n=res?Object.values(res.days).reduce((a,l)=>a+l.length,0):0,unm=res?Object.keys(res.unmatched).length:0;
+  const info=res?'<b>'+esc(pur.file)+'</b> · '+esc(fmtDay(res.covered[0])+(res.covered.length>1?' – '+fmtDay(res.covered[res.covered.length-1]):''))+
+      ' · <b>'+n+'</b> purchase'+(n===1?'':'s')+' to add'+(unm?' · <b class="bad">'+unm+' not found</b>':''):
+    'Upload the purchase Excel (same layout as the stock register — only the <b>Stock purchased</b> columns are read), then Submit — Opening and In stock go up for each day.';
+  return '<div class="att-card dc-upload"><div class="dcu-h">'+IC.cart+'<b>Purchases</b>'+(res?'<button type="button" class="mini" onclick="purchaseDetails()">View details</button><button type="button" class="mini" onclick="purchaseClear()">Clear</button>':'')+'</div>'+
+    '<p class="dcu-info">'+info+'</p>'+
+    '<div class="dcu-acts"><label class="att-btn dcu-file"><input type="file" accept=".xlsx,.xls" hidden onchange="purchaseLoad(this.files[0]);this.value=\'\'">'+IC.dl+' '+(res?'Change Excel':'Upload Excel')+'</label>'+
+      '<button type="button" class="save dcu-submit" id="purSubmit" onclick="purchaseSubmit()"'+(res?'':' disabled')+'>'+IC.check+' Submit</button></div></div>';
+}
+function purchaseDetails(){if(pur.res)openSheet('<h3>Purchases from '+esc(pur.file)+'</h3>'+purchasePreview());}
+
+// ============================================================
 // Report tab — purchases, usage, wastage and spend for a month or a year
 // ============================================================
+// ---------- Report charts (plain HTML bars; every value is also in the table below the chart) ----------
+let repBy=null;   // 'spend' | 'buys' | 'waste' — null picks spend when prices exist, else purchases
+const REP_BY={spend:{label:'Spend',fmt:rupees0},buys:{label:'Purchases',fmt:n=>num(n)},waste:{label:'Wastage',fmt:rupees0}};
+const moveVal=(m,by)=>{
+  if(by==='buys')return m.kind==='in'?1:0;
+  if(by==='spend')return m.kind==='in'&&m.unit_cost!=null?Number(m.qty)*Number(m.unit_cost):0;
+  if(m.kind!=='waste')return 0;const i=itemById(m.item_id);return Number(m.qty)*Number(i&&i.last_cost||0);
+};
+// 0, a round step, … covering max
+function niceMax(max){if(max<=0)return 1;const p=Math.pow(10,Math.floor(Math.log10(max))),f=max/p;return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p;}
+const tipAttr=(l,v)=>' tabindex="0" data-tl="'+esc(l)+'" data-tv="'+esc(v)+'"';
+// rows: [{l, sub, v}] → horizontal bars, value label at the end of each bar
+function hbarChart(rows,fmt,empty){
+  rows=rows.filter(r=>r.v>0);
+  if(!rows.length)return '<div class="ch-empty">'+esc(empty)+'</div>';
+  const top=niceMax(Math.max(...rows.map(r=>r.v)));
+  return '<div class="ch-hbar" role="img" aria-label="Bar chart, values listed in the table below">'+rows.map(r=>
+    '<div class="hb-row'+(r.other?' other':'')+'"'+tipAttr(r.l,fmt(r.v))+'><span class="hb-l">'+esc(r.l)+(r.sub?'<small>'+esc(r.sub)+'</small>':'')+'</span>'+
+    '<span class="hb-track"><i style="width:calc((100% - 70px) * '+(r.v/top).toFixed(4)+')"></i><b>'+esc(fmt(r.v))+'</b></span></div>').join('')+'</div>';
+}
+// pts: [{l, tip, v, on}] → columns with a y axis; on = onclick
+function colChart(pts,fmt,empty){
+  const max=Math.max(0,...pts.map(p=>p.v));
+  if(!max)return '<div class="ch-empty">'+esc(empty)+'</div>';
+  const top=niceMax(max),ticks=[top,top/2,0];
+  const every=pts.length>16?5:1;   // label every 5th day in a month
+  return '<div class="ch-col" role="img" aria-label="Column chart, values listed below">'+
+    '<div class="cc-y">'+ticks.map(t=>'<span>'+esc(fmt(t))+'</span>').join('')+'</div>'+
+    '<div class="cc-plot"><div class="cc-grid">'+ticks.map(()=>'<i></i>').join('')+'</div>'+
+    '<div class="cc-bars" style="grid-template-columns:repeat('+pts.length+',minmax(0,1fr))">'+pts.map((p,k)=>
+      '<div class="cc-c'+(p.on?' link':'')+'"'+tipAttr(p.tip,fmt(p.v))+(p.on?' onclick="'+p.on+'"':'')+'><i style="height:'+(p.v*100/top).toFixed(2)+'%"></i>'+
+      '<span class="cc-x">'+((k+1)%every===0||k===0?esc(p.l):'')+'</span></div>').join('')+'</div></div></div>';
+}
+// top n, the rest folded into "Other"
+function topN(rows,n){rows=rows.filter(r=>r.v>0).sort((a,b)=>b.v-a.v);if(rows.length<=n)return rows;
+  const rest=rows.slice(n-1);return rows.slice(0,n-1).concat([{l:'Other '+rest.length+' items',other:true,v:rest.reduce((a,r)=>a+r.v,0)}]);}
+// one shared tooltip for every chart
+function chartTip(e){
+  const t=e.target.closest&&e.target.closest('[data-tl]');let tip=document.getElementById('chTip');
+  if(!t){if(tip)tip.hidden=true;return;}
+  if(!tip){tip=document.createElement('div');tip.id='chTip';tip.className='ch-tip';tip.innerHTML='<b></b><span></span>';document.body.appendChild(tip);}
+  tip.firstChild.textContent=t.dataset.tv;tip.lastChild.textContent=t.dataset.tl;tip.hidden=false;
+  const r=t.getBoundingClientRect(),x=e.clientX!=null&&e.type!=='focusin'?e.clientX:r.left+r.width/2,y=e.clientY!=null&&e.type!=='focusin'?e.clientY:r.top;
+  const w=tip.offsetWidth;tip.style.left=Math.max(8,Math.min(innerWidth-w-8,x-w/2))+'px';tip.style.top=Math.max(8,y-tip.offsetHeight-12)+'px';
+}
+['pointerover','pointermove','focusin'].forEach(ev=>document.addEventListener(ev,chartTip));
+document.addEventListener('focusout',()=>{const t=document.getElementById('chTip');if(t)t.hidden=true;});
+addEventListener('scroll',()=>{const t=document.getElementById('chTip');if(t)t.hidden=true;},true);
 function tallies(list){
   const by={};
   list.forEach(m=>{
@@ -875,29 +1039,42 @@ async function renderReport(){
   const catTable=Object.keys(byCat).length?'<div class="tbl-scroll"><table class="att-table"><thead><tr><th>Category</th><th class="num">Spend</th><th class="num">Share</th></tr></thead><tbody>'+
     Object.entries(byCat).sort((a,b)=>b[1]-a[1]).map(([c,v])=>'<tr><td><b>'+esc(c)+'</b></td><td class="num pay">'+rupees0(v)+'</td><td class="num">'+(spend?Math.round(v*100/spend)+'%':'—')+'</td></tr>').join('')+
     '</tbody></table></div>':'';
-  // year: spend per month
-  let months='';
-  if(view==='year'){
-    // spend per month; months without prices still show how many purchases / items used
-    const per=Array.from({length:12},()=>({v:0,buys:0,used:new Set()}));
-    moves.forEach(m=>{const x=per[+m.moved_on.slice(5,7)-1];
-      if(m.kind==='in'){x.buys++;if(m.unit_cost!=null)x.v+=Number(m.qty)*Number(m.unit_cost);}else if(m.kind==='out')x.used.add(m.item_id);});
-    const nowY=new Date().getFullYear(),nowM=new Date().getMonth();
-    months='<div class="yr-grid">'+per.map((x,m)=>{const any=x.buys||x.used.size;
-      return '<button type="button" class="yr-month'+(any?' has':'')+(calY>nowY||(calY===nowY&&m>nowM)?' future':'')+(calY===nowY&&m===nowM?' today':'')+'" onclick="view=\'month\';calM='+m+';renderReport()">'+
-      '<span class="yn">'+MONTHS[m].slice(0,3)+'</span>'+
-      (x.v?'<span class="yh">'+rupees0(x.v)+'</span>':any?'<span class="yh">'+x.buys+' <small>buys</small></span>':'')+
-      (any?'<span class="yd">'+x.buys+' purchase'+(x.buys===1?'':'s')+' · '+x.used.size+' items used</span>':'<span class="yd">—</span>')+'</button>';}).join('')+'</div>';
-  }
+  // charts — one measure for all of them, picked above the charts
+  const by0=repBy||(spend?'spend':'buys'),M=REP_BY[by0],isYr=view==='year';
+  const measureSeg='<div class="ch-bar"><span>Charts show</span><div class="seg">'+Object.entries(REP_BY).map(([k,x])=>
+    '<button type="button" class="'+(k===by0?'sel':'')+'" onclick="repBy=\''+k+'\';renderReport()">'+x.label+'</button>').join('')+'</div></div>';
+  const noneMsg=by0==='spend'?'No priced purchases in '+label+' — add a price when you record a purchase to see spend.':
+    by0==='waste'?'No wastage (with a known price) in '+label+'.':'No purchases in '+label+'.';
+  // trend: per month in a year, per day in a month
+  const nDays=new Date(calY,calM+1,0).getDate();
+  const per=Array.from({length:isYr?12:nDays},()=>({spend:0,buys:0,waste:0,used:new Set()}));
+  moves.forEach(m=>{const x=per[+(isYr?m.moved_on.slice(5,7):m.moved_on.slice(8,10))-1];if(!x)return;
+    x.spend+=moveVal(m,'spend');x.buys+=moveVal(m,'buys');x.waste+=moveVal(m,'waste');if(m.kind==='out')x.used.add(m.item_id);});
+  const trend=colChart(per.map((x,k)=>isYr?{l:MONTHS[k].slice(0,3),tip:MONTHS[k]+' '+calY,v:x[by0],on:'view=\'month\';calM='+k+';renderReport()'}
+      :{l:String(k+1),tip:fmtDay(calY+'-'+pad(calM+1)+'-'+pad(k+1)),v:x[by0]}),M.fmt,noneMsg);
+  const monthTable=isYr?'<div class="tbl-scroll"><table class="att-table"><thead><tr><th>Month</th><th class="num">Spend</th><th class="num">Purchases</th><th class="num">Wastage</th><th class="num">Items used</th></tr></thead><tbody>'+
+    per.map((x,k)=>'<tr class="link" onclick="view=\'month\';calM='+k+';renderReport()"><td><b>'+MONTHS[k]+'</b></td><td class="num pay">'+(x.spend?rupees0(x.spend):'—')+'</td><td class="num">'+(x.buys||'—')+'</td>'+
+      '<td class="num">'+(x.waste?rupees0(x.waste):'—')+'</td><td class="num">'+(x.used.size||'—')+'</td></tr>').join('')+
+    '<tr class="tot"><td>Total</td><td class="num pay">'+rupees0(spend)+'</td><td class="num">'+buys+'</td><td class="num">'+rupees0(wasteVal)+'</td><td></td></tr></tbody></table></div>':'';
+  const itemVal=(id,t)=>by0==='spend'?t.spend:by0==='buys'?t.buys:t.waste*Number((itemById(id)||{}).last_cost||0);
+  const itemChart=hbarChart(topN(Object.entries(by).map(([id,t])=>{const i=itemById(id)||{name:'(deleted item)'};return {l:i.name,v:itemVal(id,t)};}),10),M.fmt,noneMsg);
+  const supVal={},catVal={};
+  moves.forEach(m=>{const v=moveVal(m,by0);if(!v)return;const i=itemById(m.item_id);
+    const ck=(i&&i.category)||'Other';catVal[ck]=(catVal[ck]||0)+v;
+    if(m.kind==='in'){const sk=m.supplier_id||'';supVal[sk]=(supVal[sk]||0)+v;}});
+  const supChart=by0==='waste'?'<div class="ch-empty">Wastage isn\'t tied to a supplier — pick Spend or Purchases.</div>':
+    hbarChart(topN(Object.entries(supVal).map(([k,v])=>({l:k?(supById(k)||{name:'(deleted supplier)'}).name:'No supplier',v})),8),M.fmt,noneMsg);
+  const catChart=hbarChart(topN(Object.entries(catVal).map(([c,v])=>({l:c,v})),8),M.fmt,noneMsg);
+  const chartCard=(title,chart,table)=>'<h3 class="att-sub">'+title+'</h3><div class="att-card rep-card">'+chart+(table?'<div class="rep-tbl">'+table+'</div>':'')+'</div>';
   w.innerHTML=head+
     '<div class="inv-stats">'+
       '<div class="inv-stat"><span>Spend</span><b>'+rupees0(spend)+'</b><small>'+buys+' purchase'+(buys===1?'':'s')+'</small></div>'+
       '<div class="inv-stat'+(wasteVal?' bad':'')+'"><span>Wastage</span><b>'+rupees0(wasteVal)+'</b><small>approx, at last price</small></div>'+
       '<div class="inv-stat'+(items.filter(isLow).length?' bad':'')+'"><span>Low stock now</span><b>'+items.filter(isLow).length+'</b></div>'+
-    '</div>'+months+
-    '<div class="rep-layout"><div class="rep-main"><h3 class="att-sub">'+IC.rupee+' '+label+' by item</h3><div class="att-card">'+itemTable+'</div></div>'+
-      '<div class="rep-side"><h3 class="att-sub">By supplier</h3><div class="att-card">'+supTable+'</div>'+
-        (catTable?'<h3 class="att-sub">By category</h3><div class="att-card">'+catTable+'</div>':'')+'</div></div>'+
+    '</div>'+measureSeg+
+    chartCard(IC.chart+' '+M.label+(isYr?' by month · '+calY:' by day · '+MONTHS[calM]),trend+(isYr?'<p class="ch-note">Tap a month to open it.</p>':''),monthTable)+
+    '<div class="rep-layout"><div class="rep-main">'+chartCard(IC.rupee+' '+label+' by item <small class="ch-sub">top 10 by '+M.label.toLowerCase()+'</small>',itemChart,rows.length?itemTable:'')+'</div>'+
+      '<div class="rep-side">'+chartCard('By supplier',supChart,Object.keys(bySup).length?supTable:'')+(catTable||Object.keys(catVal).length?chartCard('By category',catChart,catTable):'')+'</div></div>'+
     '<div class="att-actions"><button class="att-btn" onclick="dailyMode=\'orders\';showTab(\'daily\')">'+IC.box+' Usage from Petpooja orders</button></div>'+
     '<p class="att-foot">Spend counts purchases with a price. Wastage value uses each item\'s last purchase price. Stock counts (corrections) are listed in History.</p>'+
     '<div class="att-actions"><button class="att-btn" onclick="exportCSV()">'+IC.dl+' Export '+(view==='year'?calY:MONTHS[calM].slice(0,3)+' '+calY)+' CSV</button></div>';

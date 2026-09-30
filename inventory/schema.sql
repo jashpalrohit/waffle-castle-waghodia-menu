@@ -12,7 +12,7 @@
 --   inv_moves      every stock change: in (purchase), out (used), waste, adjust (stock count),
 --                  count (a daily count that matched — qty 0, changes nothing, marks the item as counted).
 --                  source: 'manual' (single entry), 'daily' (Daily count sheet), 'import' (from the Excel register),
---                  'orders' (packaging / items used, worked out from Petpooja orders)
+--                  'orders' (packaging / items used, worked out from Petpooja orders), 'purchase' (Daily → Purchases Excel upload)
 --
 -- inv_items.stock and inv_items.last_cost are kept up to date automatically from inv_moves.
 -- ============================================================
@@ -64,7 +64,7 @@ alter table public.inv_moves add constraint inv_moves_qty_check check (
   (kind = 'count' and qty = 0) or (kind = 'adjust' and qty <> 0) or (kind in ('in', 'out', 'waste') and qty > 0));
 alter table public.inv_moves add column if not exists source text not null default 'manual';
 alter table public.inv_moves drop constraint if exists inv_moves_source_check;
-alter table public.inv_moves add constraint inv_moves_source_check check (source in ('manual', 'daily', 'import', 'orders'));
+alter table public.inv_moves add constraint inv_moves_source_check check (source in ('manual', 'daily', 'import', 'orders', 'purchase'));
 create index if not exists inv_moves_item_idx on public.inv_moves (item_id, moved_on);
 create index if not exists inv_moves_day_idx  on public.inv_moves (moved_on);
 
@@ -183,3 +183,29 @@ begin
   return n;
 end $$;
 grant execute on function public.inv_record_orders(date, jsonb) to anon, authenticated;
+
+-- ---- Daily → Purchases: purchases for one or many days from an uploaded Excel sheet ----
+-- p_days: every date the sheet has a "Stock purchased" column for; that date's earlier Excel-purchase
+-- entries (source 'purchase') are replaced, so uploading the same sheet again simply updates it.
+-- p_rows: [{item_id, day, qty, unit_cost, supplier_id}]
+create or replace function public.inv_record_purchases(p_days date[], p_rows jsonb) returns int
+language plpgsql set search_path = '' as $$
+declare r jsonb; n int := 0; v_qty numeric; v_day date;
+begin
+  if exists (select 1 from unnest(p_days) d where d > (now() at time zone 'Asia/Kolkata')::date) then
+    raise exception 'The date cannot be in the future';
+  end if;
+  delete from public.inv_moves where source = 'purchase' and moved_on = any(p_days);
+  for r in select * from jsonb_array_elements(coalesce(p_rows, '[]'::jsonb)) loop
+    v_qty := (r ->> 'qty')::numeric;
+    v_day := (r ->> 'day')::date;
+    if v_qty is null or v_qty <= 0 then continue; end if;
+    if not (v_day = any(p_days)) then raise exception 'Row date % is not in the sheet', v_day; end if;
+    insert into public.inv_moves (item_id, kind, qty, unit_cost, supplier_id, moved_on, note, source)
+    values ((r ->> 'item_id')::uuid, 'in', v_qty, nullif(r ->> 'unit_cost', '')::numeric,
+            nullif(r ->> 'supplier_id', '')::uuid, v_day, 'Purchase (Excel upload)', 'purchase');
+    n := n + 1;
+  end loop;
+  return n;
+end $$;
+grant execute on function public.inv_record_purchases(date[], jsonb) to anon, authenticated;

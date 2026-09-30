@@ -243,9 +243,59 @@
     background:var(--amber);color:#231600;box-shadow:0 4px 12px rgba(255,143,0,.3);letter-spacing:.3px;text-transform:uppercase}
   .dc-save .save:disabled{opacity:.45;cursor:default;box-shadow:none}
 
+  /* Purchase */
+  .dcu-info b.bad{color:#c2410c}
+  .pur-q{color:#1b7f3a;white-space:nowrap}
+  .pur-warn{display:flex;gap:10px;align-items:flex-start;margin-top:12px;border-color:#f5c2a8;background:#fff5ef;font-size:13px;color:var(--ink2);line-height:1.5}
+  .pur-warn .ico{flex:0 0 auto;width:20px;height:20px;color:#c2410c;margin-top:1px}
+  .pur-warn small{display:block;color:var(--muted);font-weight:600;margin-top:4px}
+  .hist-week .tbl-scroll{margin-top:8px}
+
   /* Report */
   .yr-month .yh small{font-size:12px;font-weight:700;color:var(--muted)}
   .rep-side .att-sub:first-child{margin-top:20px}
+  /* Report charts — one bar colour (#d97706, 3:1 on white); values are also printed on the bars and in the tables */
+  .ch-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:16px 2px 0}
+  .ch-bar>span{font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+  .att-sub .ico{width:18px;height:18px;vertical-align:-3px}
+  .ch-sub{font-size:11.5px;font-weight:600;color:var(--muted);margin-left:4px}
+  .rep-card{padding:16px}
+  .rep-tbl{margin-top:14px;padding-top:6px;border-top:1px solid var(--line)}
+  .ch-empty{font-size:13px;color:var(--muted);font-weight:600;text-align:center;padding:26px 10px;background:#fffbef;border-radius:12px}
+  .ch-note{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:8px}
+  .ch-hbar{display:flex;flex-direction:column;gap:2px}
+  .hb-row{display:grid;grid-template-columns:minmax(90px,38%) minmax(0,1fr);align-items:center;gap:10px;padding:4px 6px;border-radius:8px;outline:none}
+  .hb-row:hover,.hb-row:focus-visible{background:#fff6e0}
+  .hb-row:focus-visible{box-shadow:0 0 0 2px var(--amber)}
+  .hb-l{font-size:12.5px;font-weight:700;color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .hb-l small{display:block;font-size:10.5px;color:var(--muted);font-weight:600}
+  .hb-track{display:flex;align-items:center;gap:6px;min-width:0}
+  .hb-track i{display:block;height:14px;min-width:3px;background:#d97706;border-radius:0 4px 4px 0;flex:0 0 auto}
+  .hb-row:hover .hb-track i,.hb-row:focus-visible .hb-track i{background:#b45f04}
+  .hb-row.other .hb-track i{background:#e8c9a0}
+  .hb-row.other .hb-l{color:var(--muted)}
+  .hb-track b{font-size:12px;font-weight:800;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .ch-col{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;height:190px}
+  .cc-y{display:flex;flex-direction:column;justify-content:space-between;padding-bottom:20px;text-align:right}
+  .cc-y span{font-size:10.5px;color:var(--muted);font-weight:600;line-height:1;transform:translateY(-50%);font-variant-numeric:tabular-nums}
+  .cc-y span:last-child{transform:translateY(50%)}
+  .cc-plot{position:relative;min-width:0}
+  .cc-grid{position:absolute;inset:0 0 20px 0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}
+  .cc-grid i{display:block;border-top:1px solid #f3ead0}
+  .cc-grid i:last-child{border-top-color:var(--line)}
+  .cc-bars{position:absolute;inset:0;display:grid;gap:2px}
+  .cc-c{position:relative;display:flex;align-items:flex-end;justify-content:center;padding-bottom:20px;border-radius:6px 6px 0 0;outline:none}
+  .cc-c i{display:block;width:min(100%,34px);background:#d97706;border-radius:4px 4px 0 0}
+  .cc-c:hover,.cc-c:focus-visible{background:rgba(246,165,42,.12)}
+  .cc-c:hover i,.cc-c:focus-visible i{background:#b45f04}
+  .cc-c.link{cursor:pointer}
+  .cc-x{position:absolute;bottom:0;left:50%;transform:translateX(-50%);font-size:10.5px;color:var(--muted);font-weight:700;white-space:nowrap;line-height:20px}
+  .ch-tip{position:fixed;z-index:200;pointer-events:none;background:#2b1206;color:#fff;border-radius:10px;padding:7px 10px;box-shadow:0 6px 18px rgba(0,0,0,.2);
+    font-family:var(--sans);display:flex;flex-direction:column;gap:1px;max-width:240px}
+  .ch-tip b{font-size:14px;font-weight:800;font-variant-numeric:tabular-nums}
+  .ch-tip span{font-size:11.5px;color:#f0e2b8;font-weight:600}
+  .att-table tr.link{cursor:pointer}
+  .att-table tr.link:hover td{background:#fff6e0}
 
   @media (min-width:640px){
     .inv-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
