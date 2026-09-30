@@ -172,6 +172,24 @@ function render(){
   app.innerHTML=top+body;
   document.getElementById('count').textContent=menu.categories.reduce((a,c)=>a+c.items.length,0)+' items in '+menu.categories.length+' categories';
   renderOffers();
+  renderCatSide();
+}
+// ---- Desktop category sidebar (hidden on phones, where the floating Menu button is used) ----
+function renderCatSide(){
+  const side=document.getElementById('catSide');if(!side)return;
+  const rows=menu.categories.map(c=>{const n=c.items.filter(isVisible).length;if(!manage&&!n)return '';
+    return '<button type="button" class="cat-side-item" data-cid="'+c.id+'" onclick="jumpToCat(\''+c.id+'\')"><span>'+esc(c.category)+'</span><span class="n">'+n+'</span></button>';}).join('');
+  side.innerHTML='<div class="cat-side-h">Categories</div>'+(rows||'<div class="offers-empty">No categories yet.</div>');
+  syncCatSide();
+}
+// Highlight the category whose heading was last scrolled past
+function syncCatSide(){
+  const side=document.getElementById('catSide');
+  if(!side||!side.offsetParent)return;   // sidebar hidden (phone)
+  let cur=null;
+  document.querySelectorAll('#app .cat-h').forEach(h=>{if(h.getBoundingClientRect().top<170)cur=h.id.slice(2);});
+  if(!cur){const f=document.querySelector('#app .cat-h');cur=f&&f.id.slice(2);}
+  side.querySelectorAll('.cat-side-item').forEach(b=>b.classList.toggle('active',b.dataset.cid===cur));
 }
 // ---- Offers & Notes (collapsible; owner-editable, stored with the menu in Supabase) ----
 // Escape first (safe), then turn **wrapped** text into bold. Owner writes **like this**.
@@ -634,6 +652,7 @@ function _onScroll(){
   else if(_acc>14)_setNav(true);     // moved down enough → shrink
   else if(_acc<-14)_setNav(false);   // moved up enough → expand
   _lastY=y;_ticking=false;
+  syncCatSide();
 }
 window.addEventListener('scroll',()=>{if(!_ticking){_ticking=true;requestAnimationFrame(_onScroll);}},{passive:true});
 if(toTop)toTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
