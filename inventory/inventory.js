@@ -670,29 +670,37 @@ async function saveDay(){
 // Recording a day again replaces that day's order usage. Rules live in packaging.js.
 // ============================================================
 let dailyMode='count';
-const ord={res:null,file:'',day:null,recorded:new Set()};
+const ord={res:null,file:'',day:null,recorded:new Set(),submittedTo:null};
 // Upload + Submit bar at the top of the Daily count
 function ordersBar(){
   const days=ord.res?Object.keys(ord.res.days).sort():[];
-  let info='Upload the Petpooja “Order Report” Excel, then Submit — packaging &amp; items used are filled in for that day.';
+  let info='Upload the Petpooja “Order Report” Excel, then Submit — packaging &amp; items used by all its orders are filled in on the day shown below.';
   if(days.length){
-    const used=new Set(days.flatMap(x=>Object.keys(ordersUse(x)))).size,orders=days.reduce((a,x)=>a+ord.res.days[x].orders,0);
-    const done=days.every(x=>ord.recorded.has(x));
+    const used=Object.keys(ordersUseAll()).length,orders=days.reduce((a,x)=>a+ord.res.days[x].orders,0);
+    const done=ord.submittedTo===dayK;
     info='<b>'+esc(ord.file)+'</b> · '+(days.length>1?fmtDay(days[0])+' – '+fmtDay(days[days.length-1]):fmtDay(days[0]))+' · '+orders+' orders · <b>'+used+'</b> items to update'+
-      (done?' · <b class="rec">Submitted ✓</b>':'');
+      (done?' · <b class="rec">Submitted on '+esc(fmtDay(dayK))+' ✓</b>':' · Submit records it on <b>'+esc(fmtDay(dayK))+'</b>');
   }
   return '<div class="att-card dc-upload"><div class="dcu-h">'+IC.box+'<b>Petpooja orders</b>'+(ord.res?'<button type="button" class="mini" onclick="openOrders()">View details</button>':'')+'</div>'+
     '<p class="dcu-info">'+info+'</p>'+
     '<div class="dcu-acts"><label class="att-btn dcu-file"><input type="file" accept=".xlsx,.xls" hidden onchange="ordersLoad(this.files[0])">'+IC.dl+' '+(ord.res?'Change Excel':'Upload Excel')+'</label>'+
       '<button type="button" class="save dcu-submit" onclick="submitOrders()"'+(days.length?'':' disabled')+'>'+IC.check+' Submit</button></div></div>';
 }
+// Submit puts the usage of every order in the file (all its days together) on the day open in the Daily count.
 async function submitOrders(){
-  const days=ord.res?Object.keys(ord.res.days).sort().filter(x=>x<=today()):[];
-  if(!days.length)return toast('Upload a Petpooja order Excel first',true);
+  if(!ord.res||!Object.keys(ord.res.days).length)return toast('Upload a Petpooja order Excel first',true);
+  const k=dayK||today();
+  if(k>today())return toast('Cannot record future dates',true);
   if(!confirmLeaveDay())return;
-  dayDirty=new Set();
-  dayK=days[days.length-1];day=null;   // show the (last) day from the file once it is recorded
-  await recordOrders(days);
+  const {data:prev,error:e1}=await sb.from('inv_moves').select('id').eq('source','orders').eq('moved_on',k).limit(1);
+  if(e1)return toast(dbErr(e1),true);
+  if(prev&&prev.length&&!confirm('Order usage for '+fmtDay(k)+' was already recorded. Replace it with this file?'))return;
+  const rows=Object.entries(ordersUseAll()).filter(([,q])=>q>0).map(([item_id,qty])=>({item_id,qty}));
+  const {error}=await sb.rpc('inv_record_orders',{p_day:k,p_rows:rows});
+  if(error)return toast(dbErr(error),true);
+  dayDirty=new Set();dayK=k;day=null;ord.submittedTo=k;ord.recorded.add(k);
+  toast('Recorded '+rows.length+' item'+(rows.length===1?'':'s')+' used on '+fmtDay(k));
+  await afterChange();
 }
 function openOrders(){if(!confirmLeaveDay())return;dailyMode='orders';dayDirty=new Set();renderDaily();window.scrollTo({top:0});}
 function backToCount(){dailyMode='count';if(ord.day)dayK=ord.day;day=null;renderDaily();window.scrollTo({top:0});}
@@ -704,7 +712,7 @@ async function ordersLoad(file){
     const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:true,defval:null});
     const res=PACKAGING_LOGIC.analyse(rows),days=Object.keys(res.days).sort();
     if(!days.length)return toast('No orders found in this file',true);
-    ord.res=res;ord.file=file.name;ord.day=days[days.length-1];
+    ord.res=res;ord.file=file.name;ord.day=days[days.length-1];ord.submittedTo=null;
     await ordersRecorded();renderDaily();toast('Loaded '+days.length+' day'+(days.length===1?'':'s')+' of orders — press Submit to update the count');
   }catch(e){toast(e.message||String(e),true);}
 }
@@ -713,6 +721,11 @@ async function ordersRecorded(){
   const days=ord.res?Object.keys(ord.res.days).sort():[];if(!days.length)return;
   const {data}=await sb.from('inv_moves').select('moved_on').eq('source','orders').gte('moved_on',days[0]).lte('moved_on',days[days.length-1]);
   (data||[]).forEach(m=>ord.recorded.add(m.moved_on));
+}
+// inventory item → qty used by every order in the file, all days together
+function ordersUseAll(){
+  const by={};Object.keys(ord.res?ord.res.days:{}).forEach(x=>Object.entries(ordersUse(x)).forEach(([id,q])=>by[id]=(by[id]||0)+q));
+  return by;
 }
 // inventory item → qty used on a day (matched by name)
 function ordersUse(k){
